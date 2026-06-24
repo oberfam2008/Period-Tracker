@@ -207,6 +207,82 @@
     "</div>";
   }
 
+  /* ---------- Intimacy outlook ----------
+   * Desire and adventurousness tend to rise toward ovulation and ease off in
+   * the luteal phase. These are general patterns, not rules — the card always
+   * reminds the partner to read her cues and communicate.
+   */
+  var INTIMACY = {
+    menstrual: {
+      desire: 2, adventure: 2, verdict: "amber",
+      headline: "Let her lead — keep it gentle",
+      tip: "Closeness and affection may be more welcome than sex itself this week. Offer cuddles, a back rub, and zero pressure. If she's in the mood, keep it gentle and comforting."
+    },
+    follicular: {
+      desire: 4, adventure: 3, verdict: "green",
+      headline: "Warming up — and getting better",
+      tip: "Her playful, flirty side is waking up along with her energy. Build a little anticipation through the day — a flirty text, a planned night in. She's increasingly open to initiating."
+    },
+    ovulation: {
+      desire: 5, adventure: 5, verdict: "green",
+      headline: "Green light — her peak",
+      tip: "If you're going to plan a special night, this is the window. Desire, confidence, and openness are all at their highest — the most likely time she'll initiate and the best time to be adventurous together."
+    },
+    luteal_early: {
+      desire: 3, adventure: 3, verdict: "amber",
+      headline: "Still warm — read the room",
+      tip: "A relaxed, connected evening can absolutely set the mood, but watch her signals. Romantic and unhurried beats high-pressure right now."
+    },
+    luteal_late: {
+      desire: 2, adventure: 2, verdict: "amber",
+      headline: "Comfort over passion",
+      tip: "She may want reassurance and closeness more than sex in the days before her period — and a \"not tonight\" isn't about you. Slow, affectionate, low-key; let intimacy grow out of comfort."
+    }
+  };
+
+  var DESIRE_WORDS = ["", "Very low", "Low", "Moderate", "High", "Peak"];
+  var ADVENTURE_WORDS = ["", "Reserved", "Mellow", "Open", "Playful", "Adventurous"];
+
+  function intimacyStage(pred) {
+    if (pred.phase.key !== "luteal") return pred.phase.key;
+    return (pred.daysUntilNext <= 4) ? "luteal_late" : "luteal_early";
+  }
+
+  function meter(filled, icon) {
+    var out = "";
+    for (var i = 1; i <= 5; i++) {
+      out += '<span class="pip' + (i <= filled ? "" : " pip-dim") + '">' + icon + "</span>";
+    }
+    return '<span class="meter">' + out + "</span>";
+  }
+
+  function buildIntimacy(pred, moon) {
+    var key = intimacyStage(pred);
+    var info = INTIMACY[key];
+
+    var moonNote = "";
+    if (moon.name === "Full Moon") {
+      moonNote = "<p class=\"muted\">🌕 Full moon: intensity and emotions run high tonight — passion can spike, but so can sensitivity.</p>";
+    } else if (moon.name === "New Moon") {
+      moonNote = "<p class=\"muted\">🌑 New moon: a quieter, more intimate energy — connection over fireworks.</p>";
+    }
+
+    return '<div class="intimacy-verdict intimacy-' + info.verdict + '">' +
+        "<strong>" + info.headline + "</strong>" +
+      "</div>" +
+      '<div class="intimacy-meters">' +
+        '<div class="im-row"><span class="im-label">Likely desire</span>' +
+          meter(info.desire, "🔥") +
+          '<span class="im-word">' + DESIRE_WORDS[info.desire] + "</span></div>" +
+        '<div class="im-row"><span class="im-label">Adventurousness</span>' +
+          meter(info.adventure, "🌶️") +
+          '<span class="im-word">' + ADVENTURE_WORDS[info.adventure] + "</span></div>" +
+      "</div>" +
+      "<p>" + info.tip + "</p>" +
+      moonNote +
+      '<p class="muted im-note">A general guide based on her cycle — every person is different. Always read her cues and communicate; consent and how she feels in the moment come first.</p>';
+  }
+
   /* ---------- Rendering helpers ---------- */
 
   function fmt(date) {
@@ -279,6 +355,20 @@
       '<p class="muted">Simple, practical ways to support ' + herLower() + " today.</p>" +
       buildTips(insightPhase, moon, sunSign) +
     "</div>";
+
+    // Intimacy outlook (cycle-driven; optional via settings)
+    if (data.showIntimacy !== false) {
+      if (pred.hasData) {
+        html += '<div class="card intimacy"><h2>💞 Intimacy outlook</h2>' +
+          buildIntimacy(pred, moon) +
+        "</div>";
+      } else {
+        html += '<div class="card intimacy"><h2>💞 Intimacy outlook</h2>' +
+          '<p class="muted">Log her period in the History tab to unlock the intimacy outlook — ' +
+          "desire and adventurousness track the cycle, so it needs a cycle day to work.</p>" +
+        "</div>";
+      }
+    }
 
     container.innerHTML = html;
   }
@@ -399,6 +489,7 @@
     document.getElementById("set-birthday").value = data.birthday || "";
     document.getElementById("set-cycle").value = data.cycleLength;
     document.getElementById("set-period").value = data.periodLength;
+    document.getElementById("set-intimacy").checked = data.showIntimacy !== false;
     updateSunPreview();
   }
 
@@ -469,6 +560,7 @@
       data.birthday = document.getElementById("set-birthday").value;
       data.cycleLength = clampNum(document.getElementById("set-cycle").value, 20, 45, 28);
       data.periodLength = clampNum(document.getElementById("set-period").value, 1, 10, 5);
+      data.showIntimacy = document.getElementById("set-intimacy").checked;
       Store.save(data);
       var status = document.getElementById("save-status");
       status.textContent = "Saved ✓";

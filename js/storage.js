@@ -9,6 +9,7 @@
     birthday: "",        // "YYYY-MM-DD"
     cycleLength: 28,
     periodLength: 5,
+    showIntimacy: true,  // show the Intimacy outlook card on the Daily tab
     periods: []          // array of "YYYY-MM-DD" period start dates
   };
 

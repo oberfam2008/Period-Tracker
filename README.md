@@ -16,6 +16,9 @@ browser (`localStorage`).
   phase, moon sign, sun sign, and the **element balance** between them
 - A **Tips & Ideas** card with simple, practical do's and don'ts for the day
   (e.g. *"today may not be the day to bring up money"*, *"bring home takeout"*)
+- An **Intimacy outlook** card: likely desire and adventurousness meters, an
+  "initiate today?" verdict, and tasteful, cycle-aware guidance — always
+  consent-forward and able to be hidden from Settings
 
 ### 📊 History tab
 - Log the first day of each period
