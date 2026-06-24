@@ -20,7 +20,8 @@ browser (`localStorage`).
   "initiate today?" verdict, and tasteful, cycle-aware guidance — always
   consent-forward and able to be hidden from Settings. **It learns**: as you log
   encounters, observed averages and who-usually-initiates are blended into the
-  advice for each phase.
+  advice for each phase. It can also offer a **suggested position idea** tuned
+  to the day's adventurousness score (toggleable in Settings).
 
 ### 📓 Journal tab
 - Add free-text **notes** about how she seemed; the app tags recurring mood

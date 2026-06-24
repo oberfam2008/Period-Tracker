@@ -295,6 +295,17 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   margin: 4px 0 12px;
 }
 .learned-note.muted { background: transparent; border-style: dashed; }
+.position-block {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255,140,200,0.12), rgba(185,140,255,0.12));
+  border: 1px solid rgba(255,140,200,0.35);
+}
+.position-block h3 { margin: 0 0 6px; color: var(--accent-2); }
+.position-block p { margin: 0 0 6px; }
+.position-block p:last-child { margin-bottom: 0; }
+.pos-emoji { font-size: 1.3rem; }
 
 /* Journal */
 textarea {

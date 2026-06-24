@@ -243,6 +243,52 @@
   var DESIRE_WORDS = ["", "Very low", "Low", "Moderate", "High", "Peak"];
   var ADVENTURE_WORDS = ["", "Reserved", "Mellow", "Open", "Playful", "Adventurous"];
 
+  /* Suggested position, keyed by the day's adventurousness (1-5). Tasteful,
+   * mainstream options; phase adds a comfort overlay on tender days. */
+  var POSITIONS = {
+    1: [
+      { emoji: "🥄", name: "Spooning", note: "side-by-side and gentle, with lots of skin-to-skin closeness — easy on low energy." },
+      { emoji: "🤍", name: "Lazy side-by-side", note: "slow, relaxed, and intimate without much effort." }
+    ],
+    2: [
+      { emoji: "💏", name: "Missionary, pillow under her hips", note: "face-to-face and connected — relaxed but a little more engaged." },
+      { emoji: "🫂", name: "Coital alignment (slow grinding)", note: "close and rhythmic, with the emphasis on connection." }
+    ],
+    3: [
+      { emoji: "🤠", name: "Her on top", note: "lets her set the pace and depth — great when she's feeling in control." },
+      { emoji: "🔄", name: "Side-by-side, facing", note: "balanced and mutual, with easy eye contact." }
+    ],
+    4: [
+      { emoji: "🐶", name: "From behind", note: "more energetic and playful — matches a livelier mood." },
+      { emoji: "🪑", name: "Seated, her on your lap", note: "playful and close, with easy changes of rhythm." }
+    ],
+    5: [
+      { emoji: "🌉", name: "Reverse cowgirl / the bridge", note: "adventurous and bold — lean into her peak energy." },
+      { emoji: "🚪", name: "Standing, or somewhere new", note: "spontaneous and daring — perfect for an adventurous day." },
+      { emoji: "🔥", name: "Try something new together", note: "she's at her most open — a great day to explore a fantasy or a new spot." }
+    ]
+  };
+
+  function dailySeed(date) {
+    var s = toIso(date), h = 0;
+    for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    return h;
+  }
+
+  function suggestPosition(adventure, stageKey, date) {
+    var tier = Math.max(1, Math.min(5, adventure));
+    var list = POSITIONS[tier];
+    var pick = list[dailySeed(date) % list.length];
+    var comfort = (stageKey === "menstrual" || stageKey === "luteal_late")
+      ? " Keep it gentle and let her steer — comfort comes first today."
+      : "";
+    return '<div class="position-block"><h3>🛏️ Position idea for today</h3>' +
+      '<p><span class="pos-emoji">' + pick.emoji + "</span> <strong>" + pick.name + "</strong> — " +
+      pick.note + comfort + "</p>" +
+      '<p class="muted">Just a playful suggestion tuned to the day\'s mood — never a script. Follow what you\'re both into.</p>' +
+    "</div>";
+  }
+
   function intimacyStage(pred) {
     if (pred.phase.key !== "luteal") return pred.phase.key;
     return (pred.daysUntilNext <= 4) ? "luteal_late" : "luteal_early";
@@ -264,7 +310,7 @@
 
   function clamp5(n) { return Math.max(1, Math.min(5, n)); }
 
-  function buildIntimacy(pred, moon, learned, notesForStage) {
+  function buildIntimacy(pred, moon, learned, notesForStage, showPositions) {
     var key = intimacyStage(pred);
     var info = INTIMACY[key];
 
@@ -321,6 +367,7 @@
       learnedBlock +
       notesNote +
       moonNote +
+      (showPositions ? suggestPosition(adventure, key, new Date()) : "") +
       '<p class="muted im-note">A general guide based on her cycle and your logs — every person is different. Always read her cues and communicate; consent and how she feels in the moment come first.</p>';
   }
 
@@ -403,7 +450,7 @@
         var learned = Learn.analyze(data);
         var stageKey = intimacyStage(pred);
         html += '<div class="card intimacy"><h2>💞 Intimacy outlook</h2>' +
-          buildIntimacy(pred, moon, learned.encounters[stageKey], learned.notes[stageKey]) +
+          buildIntimacy(pred, moon, learned.encounters[stageKey], learned.notes[stageKey], data.showPositions !== false) +
         "</div>";
       } else {
         html += '<div class="card intimacy"><h2>💞 Intimacy outlook</h2>' +
@@ -621,6 +668,7 @@
     document.getElementById("set-cycle").value = data.cycleLength;
     document.getElementById("set-period").value = data.periodLength;
     document.getElementById("set-intimacy").checked = data.showIntimacy !== false;
+    document.getElementById("set-positions").checked = data.showPositions !== false;
     updateSunPreview();
   }
 
@@ -729,6 +777,7 @@
       data.cycleLength = clampNum(document.getElementById("set-cycle").value, 20, 45, 28);
       data.periodLength = clampNum(document.getElementById("set-period").value, 1, 10, 5);
       data.showIntimacy = document.getElementById("set-intimacy").checked;
+      data.showPositions = document.getElementById("set-positions").checked;
       Store.save(data);
       var status = document.getElementById("save-status");
       status.textContent = "Saved ✓";
