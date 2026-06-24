@@ -248,24 +248,54 @@
   var POSITIONS = {
     1: [
       { emoji: "🥄", name: "Spooning", note: "side-by-side and gentle, with lots of skin-to-skin closeness — easy on low energy." },
-      { emoji: "🤍", name: "Lazy side-by-side", note: "slow, relaxed, and intimate without much effort." }
+      { emoji: "🤍", name: "Lazy side-by-side", note: "slow, relaxed, and intimate without much effort." },
+      { emoji: "🫶", name: "Chest-to-chest, barely moving", note: "lie close and still — connection over motion." },
+      { emoji: "😴", name: "Spooning with a pillow between knees", note: "extra-comfy and supported for tender days." },
+      { emoji: "🌙", name: "Side-by-side, facing, legs intertwined", note: "tangled up and quiet, easy on the body." },
+      { emoji: "🛌", name: "Her on her side, you nestled behind", note: "minimal effort, maximum closeness." },
+      { emoji: "💤", name: "Slow 'soaking' (stay connected, hardly move)", note: "calm and unhurried — just be together." },
+      { emoji: "🕯️", name: "Cuddled half-on-top of you", note: "she sets all the pace; you stay still and warm." }
     ],
     2: [
       { emoji: "💏", name: "Missionary, pillow under her hips", note: "face-to-face and connected — relaxed but a little more engaged." },
-      { emoji: "🫂", name: "Coital alignment (slow grinding)", note: "close and rhythmic, with the emphasis on connection." }
+      { emoji: "🫂", name: "Coital alignment (slow grinding)", note: "close and rhythmic, with the emphasis on connection." },
+      { emoji: "🤍", name: "Missionary, her legs together", note: "snug and gentle, with a slower rhythm." },
+      { emoji: "🦋", name: "Her on her back, knees drawn up", note: "easy, comfortable, and intimate." },
+      { emoji: "↔️", name: "Side entry (her on her back, you on your side)", note: "relaxed angle, lots of eye contact." },
+      { emoji: "🛏️", name: "Her at the edge of the bed, you kneeling", note: "comfortable for her, easy to stay close." },
+      { emoji: "🧘", name: "Seated hug (you cross-legged, her on your lap)", note: "wrapped together, slow and connected." },
+      { emoji: "💞", name: "Side-by-side, then roll into missionary", note: "ease in gently, then deepen the connection." }
     ],
     3: [
       { emoji: "🤠", name: "Her on top", note: "lets her set the pace and depth — great when she's feeling in control." },
-      { emoji: "🔄", name: "Side-by-side, facing", note: "balanced and mutual, with easy eye contact." }
+      { emoji: "🔄", name: "Side-by-side, facing", note: "balanced and mutual, with easy eye contact." },
+      { emoji: "💃", name: "Cowgirl, leaning onto your chest", note: "close and rhythmic while she steers." },
+      { emoji: "🪑", name: "You seated, her straddling and facing you", note: "intimate and interactive, easy to kiss." },
+      { emoji: "🌊", name: "Her on top, leaning back", note: "a new angle while she stays in charge." },
+      { emoji: "🤝", name: "Kneeling, facing each other", note: "mutual effort, holding onto each other." },
+      { emoji: "🛋️", name: "On the edge of the couch, her on top", note: "a change of scenery, still relaxed." },
+      { emoji: "🌀", name: "Deep spoon (knees forward)", note: "spooning with a deeper, more active angle." }
     ],
     4: [
       { emoji: "🐶", name: "From behind", note: "more energetic and playful — matches a livelier mood." },
-      { emoji: "🪑", name: "Seated, her on your lap", note: "playful and close, with easy changes of rhythm." }
+      { emoji: "🪑", name: "Seated, her on your lap (facing away)", note: "playful and close, with easy changes of rhythm." },
+      { emoji: "🦵", name: "Her at the edge of the bed, legs on your shoulders", note: "bolder angle while she's comfortable." },
+      { emoji: "⬇️", name: "From behind, chest down", note: "a deeper, more intense variation of doggy." },
+      { emoji: "🧍", name: "Standing, her bent over the bed", note: "energetic and a little daring." },
+      { emoji: "🔁", name: "Reverse cowgirl", note: "she's in control with a playful new view." },
+      { emoji: "🍳", name: "Against the kitchen counter", note: "spontaneous — break out of the bedroom." },
+      { emoji: "🎢", name: "Switch positions mid-way", note: "keep it playful by moving through two or three." }
     ],
     5: [
-      { emoji: "🌉", name: "Reverse cowgirl / the bridge", note: "adventurous and bold — lean into her peak energy." },
-      { emoji: "🚪", name: "Standing, or somewhere new", note: "spontaneous and daring — perfect for an adventurous day." },
-      { emoji: "🔥", name: "Try something new together", note: "she's at her most open — a great day to explore a fantasy or a new spot." }
+      { emoji: "🌉", name: "The bridge", note: "adventurous and bold — lean into her peak energy." },
+      { emoji: "🚪", name: "Standing, or somewhere new in the house", note: "spontaneous and daring — perfect for an adventurous day." },
+      { emoji: "🔥", name: "Try something new together", note: "she's at her most open — a great day to explore a fantasy or a new spot." },
+      { emoji: "🚿", name: "In the shower", note: "warm, slippery, and a change of setting." },
+      { emoji: "🧱", name: "Up against the wall", note: "passionate and spontaneous if you're both game." },
+      { emoji: "🎭", name: "A little role-play or a planned scene", note: "set the stage and lean into her boldness." },
+      { emoji: "🪢", name: "Add a new element (toy, blindfold, etc.)", note: "she's most receptive now — a great time to explore together." },
+      { emoji: "🛞", name: "The wheelbarrow", note: "athletic and adventurous — only if you're both up for it." },
+      { emoji: "🌶️", name: "Revisit a favorite from your logs, turned up", note: "take something you both loved and make it bigger." }
     ]
   };
 
