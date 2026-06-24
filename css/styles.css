@@ -58,15 +58,16 @@ body {
 }
 .tab {
   flex: 1;
-  padding: 12px;
+  padding: 11px 8px;
   border: none;
   background: transparent;
   color: var(--muted);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.15s ease;
+  white-space: nowrap;
 }
 .tab:hover { color: var(--text); }
 .tab.active {
@@ -285,6 +286,87 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 .pip-dim { filter: grayscale(1); opacity: 0.3; }
 .im-word { font-weight: 700; }
 .im-note { margin-top: 12px; font-size: 0.82rem; border-top: 1px dashed var(--border); padding-top: 10px; }
+.learned-note {
+  background: rgba(185,140,255,0.12);
+  border: 1px solid rgba(185,140,255,0.3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  margin: 4px 0 12px;
+}
+.learned-note.muted { background: transparent; border-style: dashed; }
+
+/* Journal */
+textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+}
+textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.pattern-row {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.pattern-row:last-of-type { border-bottom: none; }
+.pattern-stage { width: 110px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+.pattern-data { font-size: 0.9rem; }
+
+.journal-item {
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.journal-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.journal-head button {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--period);
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+.journal-body { font-size: 0.95rem; }
+.phase-tag {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+.phase-menstrual { background: rgba(255,93,115,0.18); color: var(--period); }
+.phase-follicular { background: rgba(79,209,197,0.18); color: var(--fertile); }
+.phase-ovulation { background: rgba(255,209,102,0.2); color: var(--ovulation); }
+.phase-luteal { background: rgba(185,140,255,0.2); color: var(--accent); }
 
 .app-footer { margin-top: 24px; text-align: center; }
 
@@ -292,5 +374,6 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   .cosmic-grid { grid-template-columns: 1fr; }
   .pred-grid { grid-template-columns: 1fr; }
   .tips-cols { grid-template-columns: 1fr; }
+  .tab { font-size: 0.85rem; padding: 10px 4px; }
   .log-row { flex-direction: column; align-items: stretch; }
 }

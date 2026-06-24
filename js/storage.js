@@ -10,7 +10,9 @@
     cycleLength: 28,
     periodLength: 5,
     showIntimacy: true,  // show the Intimacy outlook card on the Daily tab
-    periods: []          // array of "YYYY-MM-DD" period start dates
+    periods: [],         // array of "YYYY-MM-DD" period start dates
+    notes: [],           // [{ id, date, text }]
+    encounters: []       // [{ id, date, desire:1-5, adventure:1-5, initiator:"her"|"him"|"mutual" }]
   };
 
   function load() {

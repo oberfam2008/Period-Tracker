@@ -18,7 +18,24 @@ browser (`localStorage`).
   (e.g. *"today may not be the day to bring up money"*, *"bring home takeout"*)
 - An **Intimacy outlook** card: likely desire and adventurousness meters, an
   "initiate today?" verdict, and tasteful, cycle-aware guidance — always
-  consent-forward and able to be hidden from Settings
+  consent-forward and able to be hidden from Settings. **It learns**: as you log
+  encounters, observed averages and who-usually-initiates are blended into the
+  advice for each phase.
+
+### 📓 Journal tab
+- Add free-text **notes** about how she seemed; the app tags recurring mood
+  keywords by cycle phase
+- Log **encounters** rated on the same Desire (1–5) and Adventurousness (1–5)
+  scales, plus who initiated
+- A **Patterns learned** summary per phase and a phase-tagged timeline of entries
+
+### 🧠 How the learning works
+Every encounter is bucketed by the cycle phase it fell in (menstrual,
+follicular, ovulation, early/late luteal). For the current phase the outlook
+blends the built-in model with your observed averages, weighted by sample size
+(`weight = n / (n + 2)`), so a couple of logs nudge the advice and many logs
+largely drive it. Notes are scanned for a small mood vocabulary to surface
+"what you've noticed before" in each phase.
 
 ### 📊 History tab
 - Log the first day of each period

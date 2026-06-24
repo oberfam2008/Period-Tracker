@@ -16,6 +16,7 @@
     <nav class="tabs" role="tablist">
       <button class="tab active" data-tab="daily" role="tab">Daily</button>
       <button class="tab" data-tab="history" role="tab">History</button>
+      <button class="tab" data-tab="journal" role="tab">Journal</button>
       <button class="tab" data-tab="settings" role="tab">Settings</button>
     </nav>
 
@@ -37,6 +38,58 @@
         </div>
         <div id="prediction-content"></div>
         <div id="history-list"></div>
+      </section>
+
+      <!-- JOURNAL -->
+      <section id="journal" class="panel" role="tabpanel">
+        <div class="card">
+          <h2>Add a note</h2>
+          <p class="muted">Jot how she seemed — moods, symptoms, anything. The app tags these by cycle phase to surface patterns over time.</p>
+          <label>Date
+            <input type="date" id="note-date" />
+          </label>
+          <label>Note
+            <textarea id="note-text" rows="3" placeholder="e.g. Tired and a bit moody, had cramps in the evening"></textarea>
+          </label>
+          <button id="note-add" class="btn">Save note</button>
+        </div>
+
+        <div class="card">
+          <h2>Log an encounter</h2>
+          <p class="muted">Rate intimacy on the same scales as the outlook. This is what trains the advice for each phase.</p>
+          <label>Date
+            <input type="date" id="enc-date" />
+          </label>
+          <label>Desire 🔥
+            <select id="enc-desire">
+              <option value="1">1 — Very low</option>
+              <option value="2">2 — Low</option>
+              <option value="3" selected>3 — Moderate</option>
+              <option value="4">4 — High</option>
+              <option value="5">5 — Peak</option>
+            </select>
+          </label>
+          <label>Adventurousness 🌶️
+            <select id="enc-adventure">
+              <option value="1">1 — Reserved</option>
+              <option value="2">2 — Mellow</option>
+              <option value="3" selected>3 — Open</option>
+              <option value="4">4 — Playful</option>
+              <option value="5">5 — Adventurous</option>
+            </select>
+          </label>
+          <label>Who initiated?
+            <select id="enc-initiator">
+              <option value="her">She did</option>
+              <option value="mutual" selected>Mutual</option>
+              <option value="him">I did</option>
+            </select>
+          </label>
+          <button id="enc-add" class="btn">Log encounter</button>
+        </div>
+
+        <div id="patterns-content"></div>
+        <div id="journal-timeline"></div>
       </section>
 
       <!-- SETTINGS -->
@@ -86,6 +139,7 @@
 
   <script src="js/astro.js"></script>
   <script src="js/cycle.js"></script>
+  <script src="js/learn.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/app.js"></script>
 </body>

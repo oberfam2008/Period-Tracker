@@ -104,9 +104,53 @@
     return { key: "luteal", label: "Luteal" };
   }
 
+  /* Classify an arbitrary (often past) date into a cycle phase/stage,
+   * using the most recent logged period start on or before that date.
+   * Returns null if the date precedes all logged periods.
+   * stageKey matches the intimacy model keys (splits luteal early/late).
+   */
+  function classifyDate(periods, settings, date) {
+    date = toMidnight(date);
+    var starts = sortedStarts(periods);
+    if (!starts.length) return null;
+
+    var start = null, nextStart = null;
+    for (var i = 0; i < starts.length; i++) {
+      if (starts[i] <= date) { start = starts[i]; nextStart = starts[i + 1] || null; }
+    }
+    if (!start) return null; // date is before the first logged period
+
+    var cycleLen;
+    if (nextStart) {
+      cycleLen = daysBetween(start, nextStart);
+    } else {
+      cycleLen = averageCycle(periods, settings.cycleLength || 28).length;
+    }
+    if (cycleLen < 15 || cycleLen > 60) cycleLen = settings.cycleLength || 28;
+
+    var periodLen = settings.periodLength || 5;
+    var dayOfCycle = daysBetween(start, date) + 1;
+    var nextPeriod = addDays(start, cycleLen);
+    var ovulation = addDays(nextPeriod, -14);
+    var daysUntilNext = daysBetween(date, nextPeriod);
+
+    var phaseKey;
+    if (dayOfCycle <= periodLen) phaseKey = "menstrual";
+    else if (Math.abs(daysBetween(date, ovulation)) <= 1) phaseKey = "ovulation";
+    else if (date < ovulation) phaseKey = "follicular";
+    else phaseKey = "luteal";
+
+    var stageKey = phaseKey;
+    if (phaseKey === "luteal") {
+      stageKey = (daysUntilNext <= 4 && daysUntilNext >= 0) ? "luteal_late" : "luteal_early";
+    }
+    return { phaseKey: phaseKey, stageKey: stageKey, dayOfCycle: dayOfCycle };
+  }
+
   global.Cycle = {
     predict: predict,
     averageCycle: averageCycle,
+    classifyDate: classifyDate,
     addDays: addDays,
     daysBetween: daysBetween
   };

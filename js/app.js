@@ -256,9 +256,41 @@
     return '<span class="meter">' + out + "</span>";
   }
 
-  function buildIntimacy(pred, moon) {
+  var INITIATOR_TEXT = {
+    her: "she usually makes the first move",
+    him: "you're usually the one to initiate",
+    mutual: "it's usually mutual"
+  };
+
+  function clamp5(n) { return Math.max(1, Math.min(5, n)); }
+
+  function buildIntimacy(pred, moon, learned, notesForStage) {
     var key = intimacyStage(pred);
     var info = INTIMACY[key];
+
+    // Start from the model, then blend in observed data (weighted by sample size).
+    var desire = info.desire;
+    var adventure = info.adventure;
+    var verdict = info.verdict;
+    var learnedBlock = "";
+
+    if (learned && learned.count >= 2) {
+      var w = learned.count / (learned.count + 2); // more logs -> trust data more
+      desire = clamp5(Math.round(info.desire * (1 - w) + learned.avgDesire * w));
+      adventure = clamp5(Math.round(info.adventure * (1 - w) + learned.avgAdventure * w));
+      verdict = desire >= 4 ? "green" : "amber";
+
+      learnedBlock = '<div class="learned-note">📈 <strong>Refined from your logs.</strong> ' +
+        "Across <strong>" + learned.count + "</strong> encounter" + (learned.count === 1 ? "" : "s") +
+        " in this phase, " + INITIATOR_TEXT[learned.initiator] +
+        " (avg desire " + learned.avgDesire.toFixed(1) + ", adventure " +
+        learned.avgAdventure.toFixed(1) + ").</div>";
+    } else {
+      var have = learned ? learned.count : 0;
+      learnedBlock = '<div class="learned-note muted">📈 Log ' +
+        (have === 1 ? "a few more encounters" : "encounters") +
+        " in this phase (in the Journal tab) and this outlook will tune itself to her real patterns.</div>";
+    }
 
     var moonNote = "";
     if (moon.name === "Full Moon") {
@@ -267,20 +299,29 @@
       moonNote = "<p class=\"muted\">🌑 New moon: a quieter, more intimate energy — connection over fireworks.</p>";
     }
 
-    return '<div class="intimacy-verdict intimacy-' + info.verdict + '">' +
+    var notesNote = "";
+    var kws = Learn.topKeywords(notesForStage, 3);
+    if (kws.length) {
+      notesNote = '<p class="muted">📝 Your notes for this phase often mention: <strong>' +
+        kws.join(", ") + "</strong>.</p>";
+    }
+
+    return '<div class="intimacy-verdict intimacy-' + verdict + '">' +
         "<strong>" + info.headline + "</strong>" +
       "</div>" +
       '<div class="intimacy-meters">' +
         '<div class="im-row"><span class="im-label">Likely desire</span>' +
-          meter(info.desire, "🔥") +
-          '<span class="im-word">' + DESIRE_WORDS[info.desire] + "</span></div>" +
+          meter(desire, "🔥") +
+          '<span class="im-word">' + DESIRE_WORDS[desire] + "</span></div>" +
         '<div class="im-row"><span class="im-label">Adventurousness</span>' +
-          meter(info.adventure, "🌶️") +
-          '<span class="im-word">' + ADVENTURE_WORDS[info.adventure] + "</span></div>" +
+          meter(adventure, "🌶️") +
+          '<span class="im-word">' + ADVENTURE_WORDS[adventure] + "</span></div>" +
       "</div>" +
       "<p>" + info.tip + "</p>" +
+      learnedBlock +
+      notesNote +
       moonNote +
-      '<p class="muted im-note">A general guide based on her cycle — every person is different. Always read her cues and communicate; consent and how she feels in the moment come first.</p>';
+      '<p class="muted im-note">A general guide based on her cycle and your logs — every person is different. Always read her cues and communicate; consent and how she feels in the moment come first.</p>';
   }
 
   /* ---------- Rendering helpers ---------- */
@@ -359,8 +400,10 @@
     // Intimacy outlook (cycle-driven; optional via settings)
     if (data.showIntimacy !== false) {
       if (pred.hasData) {
+        var learned = Learn.analyze(data);
+        var stageKey = intimacyStage(pred);
         html += '<div class="card intimacy"><h2>💞 Intimacy outlook</h2>' +
-          buildIntimacy(pred, moon) +
+          buildIntimacy(pred, moon, learned.encounters[stageKey], learned.notes[stageKey]) +
         "</div>";
       } else {
         html += '<div class="card intimacy"><h2>💞 Intimacy outlook</h2>' +
@@ -482,6 +525,94 @@
     });
   }
 
+  /* ---------- Journal tab ---------- */
+
+  var STAGE_LABEL = {
+    menstrual: "Menstrual",
+    follicular: "Follicular",
+    ovulation: "Ovulation",
+    luteal_early: "Early luteal",
+    luteal_late: "Late luteal"
+  };
+  var STAGE_ORDER = ["menstrual", "follicular", "ovulation", "luteal_early", "luteal_late"];
+
+  function renderJournal() {
+    renderPatterns();
+    renderTimeline();
+  }
+
+  function renderPatterns() {
+    var container = document.getElementById("patterns-content");
+    if (!data.periods.length) {
+      container.innerHTML = '<div class="card empty">Log a period in History first, then your notes and encounters can be matched to cycle phases.</div>';
+      return;
+    }
+    var learned = Learn.analyze(data);
+    var rows = "";
+    STAGE_ORDER.forEach(function (k) {
+      var s = learned.encounters[k];
+      var kws = Learn.topKeywords(learned.notes[k], 3);
+      if (!s && !kws.length) return;
+      var enc = s
+        ? "🔥 " + s.avgDesire.toFixed(1) + " · 🌶️ " + s.avgAdventure.toFixed(1) +
+          " · " + INITIATOR_TEXT[s.initiator] + " (" + s.count + ")"
+        : '<span class="muted">no encounters logged</span>';
+      var notes = kws.length ? "📝 " + kws.join(", ") : "";
+      rows += '<div class="pattern-row"><div class="pattern-stage">' + STAGE_LABEL[k] + "</div>" +
+        '<div class="pattern-data">' + enc + (notes ? "<br>" + notes : "") + "</div></div>";
+    });
+    container.innerHTML = rows
+      ? '<div class="card"><h2>Patterns learned</h2>' + rows +
+        '<p class="muted" style="margin-top:10px">The Intimacy outlook blends these averages into its advice — more logs mean a more personalized read.</p></div>'
+      : '<div class="card empty">No notes or encounters logged yet. Add some above to start spotting patterns.</div>';
+  }
+
+  function renderTimeline() {
+    var container = document.getElementById("journal-timeline");
+    var items = [];
+    (data.notes || []).forEach(function (n) {
+      items.push({ type: "note", date: n.date, id: n.id, text: n.text });
+    });
+    (data.encounters || []).forEach(function (e) {
+      items.push({ type: "enc", date: e.date, id: e.id, desire: e.desire, adventure: e.adventure, initiator: e.initiator });
+    });
+    if (!items.length) { container.innerHTML = ""; return; }
+    items.sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+
+    var html = '<div class="card"><h2>Journal timeline</h2>';
+    items.forEach(function (it) {
+      var d = new Date(it.date + "T00:00:00");
+      var c = data.periods.length ? Cycle.classifyDate(data.periods, data, d) : null;
+      var phaseTag = c ? '<span class="phase-tag phase-' + c.phaseKey + '">' + STAGE_LABEL[c.stageKey] + "</span>" : "";
+      var body;
+      if (it.type === "note") {
+        body = "📝 " + escapeHtml(it.text);
+      } else {
+        body = "💞 Desire 🔥" + it.desire + " · Adventure 🌶️" + it.adventure + " · " +
+          (it.initiator === "her" ? "she initiated" : it.initiator === "him" ? "I initiated" : "mutual");
+      }
+      html += '<div class="journal-item">' +
+        '<div class="journal-head"><span>' + fmt(d) + "</span>" + phaseTag +
+          '<button data-jdel="' + it.type + ":" + it.id + '">Remove</button></div>' +
+        '<div class="journal-body">' + body + "</div>" +
+      "</div>";
+    });
+    html += "</div>";
+    container.innerHTML = html;
+
+    container.querySelectorAll("[data-jdel]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var parts = btn.getAttribute("data-jdel").split(":");
+        var type = parts[0], id = parts.slice(1).join(":");
+        if (type === "note") data.notes = data.notes.filter(function (n) { return String(n.id) !== id; });
+        else data.encounters = data.encounters.filter(function (e) { return String(e.id) !== id; });
+        Store.save(data);
+        renderJournal();
+        renderDaily();
+      });
+    });
+  }
+
   /* ---------- Settings tab ---------- */
 
   function renderSettings() {
@@ -532,6 +663,7 @@
         document.getElementById(name).classList.add("active");
         if (name === "daily") renderDaily();
         if (name === "history") renderHistory();
+        if (name === "journal") renderJournal();
         if (name === "settings") renderSettings();
       });
     });
@@ -549,6 +681,42 @@
         renderHistory();
         renderDaily();
       }
+    });
+  }
+
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  function setupJournalControls() {
+    var today = toIso(new Date());
+    document.getElementById("note-date").value = today;
+    document.getElementById("enc-date").value = today;
+
+    document.getElementById("note-add").addEventListener("click", function () {
+      var date = document.getElementById("note-date").value;
+      var text = document.getElementById("note-text").value.trim();
+      if (!date || !text) return;
+      data.notes.push({ id: uid(), date: date, text: text });
+      Store.save(data);
+      document.getElementById("note-text").value = "";
+      renderJournal();
+      renderDaily();
+    });
+
+    document.getElementById("enc-add").addEventListener("click", function () {
+      var date = document.getElementById("enc-date").value;
+      if (!date) return;
+      data.encounters.push({
+        id: uid(),
+        date: date,
+        desire: parseInt(document.getElementById("enc-desire").value, 10),
+        adventure: parseInt(document.getElementById("enc-adventure").value, 10),
+        initiator: document.getElementById("enc-initiator").value
+      });
+      Store.save(data);
+      renderJournal();
+      renderDaily();
     });
   }
 
@@ -588,6 +756,7 @@
   function init() {
     setupTabs();
     setupHistoryControls();
+    setupJournalControls();
     setupSettingsControls();
     renderDaily();
   }
