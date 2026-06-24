@@ -254,7 +254,15 @@
       { emoji: "🌙", name: "Side-by-side, facing, legs intertwined", note: "tangled up and quiet, easy on the body." },
       { emoji: "🛌", name: "Her on her side, you nestled behind", note: "minimal effort, maximum closeness." },
       { emoji: "💤", name: "Slow 'soaking' (stay connected, hardly move)", note: "calm and unhurried — just be together." },
-      { emoji: "🕯️", name: "Cuddled half-on-top of you", note: "she sets all the pace; you stay still and warm." }
+      { emoji: "🕯️", name: "Cuddled half-on-top of you", note: "she sets all the pace; you stay still and warm." },
+      { emoji: "💗", name: "Her resting on your chest", note: "you on your back, her lying along you — cozy and slow." },
+      { emoji: "🤲", name: "Foreheads touching, face-to-face", note: "eye contact and breath, almost no movement." },
+      { emoji: "🧣", name: "Fully wrapped-up gentle missionary", note: "arms and legs around each other, slow and warm." },
+      { emoji: "🌊", name: "Her on top, lying flat and still", note: "she stays draped over you and barely moves." },
+      { emoji: "🤝", name: "Side spoon with slow hand-holding", note: "tender and unhurried, hands linked." },
+      { emoji: "🐚", name: "Fetal spoon (knees tucked)", note: "the snuggest, most protective spoon." },
+      { emoji: "☕", name: "Slow half-asleep morning spoon", note: "drowsy, gentle, and low-pressure." },
+      { emoji: "🛋️", name: "Under-the-blanket full-body hug", note: "warmth and closeness first, motion optional." }
     ],
     2: [
       { emoji: "💏", name: "Missionary, pillow under her hips", note: "face-to-face and connected — relaxed but a little more engaged." },
@@ -264,7 +272,15 @@
       { emoji: "↔️", name: "Side entry (her on her back, you on your side)", note: "relaxed angle, lots of eye contact." },
       { emoji: "🛏️", name: "Her at the edge of the bed, you kneeling", note: "comfortable for her, easy to stay close." },
       { emoji: "🧘", name: "Seated hug (you cross-legged, her on your lap)", note: "wrapped together, slow and connected." },
-      { emoji: "💞", name: "Side-by-side, then roll into missionary", note: "ease in gently, then deepen the connection." }
+      { emoji: "💞", name: "Side-by-side, then roll into missionary", note: "ease in gently, then deepen the connection." },
+      { emoji: "🦶", name: "Missionary, ankles resting on your chest", note: "a gentle deeper angle without much effort." },
+      { emoji: "🌸", name: "Her on her back, one leg raised", note: "a small change of angle, still relaxed." },
+      { emoji: "🪶", name: "You on your back, her lying on top facing you", note: "close and calm, she controls the pace." },
+      { emoji: "💫", name: "Edge of bed, her reclined on her elbows", note: "comfortable and unhurried, easy eye contact." },
+      { emoji: "🪑", name: "Seated on a chair, her facing you (slow)", note: "intimate and interactive without much exertion." },
+      { emoji: "🍂", name: "Her on her stomach, pillow under hips", note: "relaxed and gentle, a soft from-behind angle." },
+      { emoji: "➕", name: "Cross-bodied (perpendicular) side angle", note: "a low-key new geometry to keep it interesting." },
+      { emoji: "🌅", name: "Slow build from kissing into missionary", note: "lots of warm-up, then settle in close." }
     ],
     3: [
       { emoji: "🤠", name: "Her on top", note: "lets her set the pace and depth — great when she's feeling in control." },
@@ -274,7 +290,15 @@
       { emoji: "🌊", name: "Her on top, leaning back", note: "a new angle while she stays in charge." },
       { emoji: "🤝", name: "Kneeling, facing each other", note: "mutual effort, holding onto each other." },
       { emoji: "🛋️", name: "On the edge of the couch, her on top", note: "a change of scenery, still relaxed." },
-      { emoji: "🌀", name: "Deep spoon (knees forward)", note: "spooning with a deeper, more active angle." }
+      { emoji: "🌀", name: "Deep spoon (knees forward)", note: "spooning with a deeper, more active angle." },
+      { emoji: "🪷", name: "Lotus (you seated, her wrapped around you)", note: "deeply connected, rocking together." },
+      { emoji: "🤸", name: "Her on top, feet planted (squat-ride)", note: "she controls depth and tempo fully." },
+      { emoji: "🛏️", name: "You sitting on the bed edge, her riding facing you", note: "upright, close, and interactive." },
+      { emoji: "🧶", name: "Side-by-side, top leg hooked over you", note: "relaxed but more active than a basic spoon." },
+      { emoji: "🔭", name: "Her on top facing away, leaning back onto you", note: "a playful new view while you support her." },
+      { emoji: "🙆", name: "Kneeling behind, both upright and close", note: "chest-to-back, slow and connected." },
+      { emoji: "💑", name: "Slow standing sway against the bed", note: "gentle and intimate, gradually building." },
+      { emoji: "🎚️", name: "Start in missionary, roll into her on top", note: "trade who leads partway through." }
     ],
     4: [
       { emoji: "🐶", name: "From behind", note: "more energetic and playful — matches a livelier mood." },
@@ -284,7 +308,15 @@
       { emoji: "🧍", name: "Standing, her bent over the bed", note: "energetic and a little daring." },
       { emoji: "🔁", name: "Reverse cowgirl", note: "she's in control with a playful new view." },
       { emoji: "🍳", name: "Against the kitchen counter", note: "spontaneous — break out of the bedroom." },
-      { emoji: "🎢", name: "Switch positions mid-way", note: "keep it playful by moving through two or three." }
+      { emoji: "🎢", name: "Switch positions mid-way", note: "keep it playful by moving through two or three." },
+      { emoji: "💇", name: "From behind, a hand in her hair / on her hips", note: "playful and a touch assertive, if she likes that." },
+      { emoji: "🔂", name: "Reverse cowgirl, leaning forward", note: "a deeper, livelier twist on reverse." },
+      { emoji: "🤗", name: "You standing at the bed edge, her legs wrapped around you", note: "close, active, and a little athletic." },
+      { emoji: "📐", name: "Prone with hips raised", note: "a deep, energetic from-behind angle." },
+      { emoji: "🪟", name: "Her kneeling on a chair, you behind", note: "a change of furniture and a fun angle." },
+      { emoji: "🌶️", name: "Spooning that builds into a faster pace", note: "start cozy, then ramp it up." },
+      { emoji: "🪞", name: "Bent over the dresser, mirror in view", note: "playful and a bit daring with a view." },
+      { emoji: "🎶", name: "Slow dance that turns into standing sex", note: "build the mood, then let it escalate." }
     ],
     5: [
       { emoji: "🌉", name: "The bridge", note: "adventurous and bold — lean into her peak energy." },
@@ -295,7 +327,14 @@
       { emoji: "🎭", name: "A little role-play or a planned scene", note: "set the stage and lean into her boldness." },
       { emoji: "🪢", name: "Add a new element (toy, blindfold, etc.)", note: "she's most receptive now — a great time to explore together." },
       { emoji: "🛞", name: "The wheelbarrow", note: "athletic and adventurous — only if you're both up for it." },
-      { emoji: "🌶️", name: "Revisit a favorite from your logs, turned up", note: "take something you both loved and make it bigger." }
+      { emoji: "🌶️", name: "Revisit a favorite from your logs, turned up", note: "take something you both loved and make it bigger." },
+      { emoji: "💪", name: "Standing carry, face-to-face", note: "bold and athletic — lift and hold if you're able." },
+      { emoji: "🪞", name: "Mirror play — watch together", note: "a thrilling visual to share on a daring day." },
+      { emoji: "⛓️", name: "Light restraint / hands held above (if you're both into it)", note: "a touch of playful control, fully consensual." },
+      { emoji: "🌳", name: "Somewhere private and thrilling", note: "a daring change of scene, mindful of privacy." },
+      { emoji: "🧊", name: "Sensory play (ice, feathers, temperature)", note: "tease the senses to amp up the adventure." },
+      { emoji: "📆", name: "A planned 'date' with a build-up all day", note: "tease and anticipate, then go all out tonight." },
+      { emoji: "🔀", name: "Swap who's in control, taking turns leading", note: "trade the lead back and forth for a playful power game." }
     ]
   };
 
