@@ -1,8 +1,9 @@
 # 🌙 Luna — Period & Cosmic Tracker
 
-A self-contained period and ovulation tracker that connects your cycle with
-**moon phases** and **astrological star signs** to offer reflective mood
-insights. No accounts, no servers, no build step — your data stays in your
+A self-contained tracker that helps a partner understand and support the person
+whose cycle is being tracked, connecting **her cycle** with **moon phases** and
+**astrological star signs** for plain-language mood insights and practical,
+day-to-day tips. No accounts, no servers, no build step — data stays in the
 browser (`localStorage`).
 
 ## Features
@@ -10,8 +11,11 @@ browser (`localStorage`).
 ### 🗓️ Daily tab
 - Current **cycle day** and **phase** (menstrual / follicular / ovulation / luteal)
 - Today's **moon phase** with illumination %, and the **moon's zodiac sign**
-- Your **sun sign** (from your birthday) and element balance
-- A combined **mood insight** that weaves cycle phase + moon + astrology together
+- Her **sun sign** (from her birthday) shown alongside the moon sign
+- A detailed **cosmic mood** reading that weaves together cycle phase, moon
+  phase, moon sign, sun sign, and the **element balance** between them
+- A **Tips & Ideas** card with simple, practical do's and don'ts for the day
+  (e.g. *"today may not be the day to bring up money"*, *"bring home takeout"*)
 
 ### 📊 History tab
 - Log the first day of each period
