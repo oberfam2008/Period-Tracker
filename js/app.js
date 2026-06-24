@@ -262,7 +262,11 @@
       { emoji: "🤝", name: "Side spoon with slow hand-holding", note: "tender and unhurried, hands linked." },
       { emoji: "🐚", name: "Fetal spoon (knees tucked)", note: "the snuggest, most protective spoon." },
       { emoji: "☕", name: "Slow half-asleep morning spoon", note: "drowsy, gentle, and low-pressure." },
-      { emoji: "🛋️", name: "Under-the-blanket full-body hug", note: "warmth and closeness first, motion optional." }
+      { emoji: "🛋️", name: "Under-the-blanket full-body hug", note: "warmth and closeness first, motion optional." },
+      { emoji: "👅", name: "Slow oral for her", note: "she lies back and relaxes while you take your time — easy on her energy." },
+      { emoji: "🤍", name: "Gentle oral for him, lying close", note: "unhurried and intimate, with no pressure." },
+      { emoji: "💋", name: "Kisses that drift into gentle oral", note: "a tender, slow build-up while staying close." },
+      { emoji: "🫦", name: "Side-by-side, relaxed oral", note: "cozy and low-effort for a quiet day." }
     ],
     2: [
       { emoji: "💏", name: "Missionary, pillow under her hips", note: "face-to-face and connected — relaxed but a little more engaged." },
@@ -280,7 +284,11 @@
       { emoji: "🪑", name: "Seated on a chair, her facing you (slow)", note: "intimate and interactive without much exertion." },
       { emoji: "🍂", name: "Her on her stomach, pillow under hips", note: "relaxed and gentle, a soft from-behind angle." },
       { emoji: "➕", name: "Cross-bodied (perpendicular) side angle", note: "a low-key new geometry to keep it interesting." },
-      { emoji: "🌅", name: "Slow build from kissing into missionary", note: "lots of warm-up, then settle in close." }
+      { emoji: "🌅", name: "Slow build from kissing into missionary", note: "lots of warm-up, then settle in close." },
+      { emoji: "👅", name: "Oral for her, you settled between her legs", note: "she stays comfortable on her back while you focus on her." },
+      { emoji: "🍑", name: "Reclined oral for him", note: "she's relaxed and sets an easy pace." },
+      { emoji: "💞", name: "Warm up with oral before slow sex", note: "build the mood, then ease into closeness." },
+      { emoji: "🪶", name: "Her at the bed's edge, you kneeling (oral)", note: "comfortable for her, attentive and connected." }
     ],
     3: [
       { emoji: "🤠", name: "Her on top", note: "lets her set the pace and depth — great when she's feeling in control." },
@@ -298,7 +306,11 @@
       { emoji: "🔭", name: "Her on top facing away, leaning back onto you", note: "a playful new view while you support her." },
       { emoji: "🙆", name: "Kneeling behind, both upright and close", note: "chest-to-back, slow and connected." },
       { emoji: "💑", name: "Slow standing sway against the bed", note: "gentle and intimate, gradually building." },
-      { emoji: "🎚️", name: "Start in missionary, roll into her on top", note: "trade who leads partway through." }
+      { emoji: "🎚️", name: "Start in missionary, roll into her on top", note: "trade who leads partway through." },
+      { emoji: "🔄", name: "Take turns — oral back and forth", note: "trade focus and stay connected throughout." },
+      { emoji: "🤝", name: "Side-by-side oral cuddle", note: "relaxed, mutual attention while facing each other." },
+      { emoji: "🪑", name: "She sits, you kneel for oral, then she leads", note: "interactive, flowing naturally into her on top." },
+      { emoji: "🌊", name: "Oral for her, then she climbs on top", note: "a natural build into her taking the pace." }
     ],
     4: [
       { emoji: "🐶", name: "From behind", note: "more energetic and playful — matches a livelier mood." },
@@ -316,7 +328,11 @@
       { emoji: "🪟", name: "Her kneeling on a chair, you behind", note: "a change of furniture and a fun angle." },
       { emoji: "🌶️", name: "Spooning that builds into a faster pace", note: "start cozy, then ramp it up." },
       { emoji: "🪞", name: "Bent over the dresser, mirror in view", note: "playful and a bit daring with a view." },
-      { emoji: "🎶", name: "Slow dance that turns into standing sex", note: "build the mood, then let it escalate." }
+      { emoji: "🎶", name: "Slow dance that turns into standing sex", note: "build the mood, then let it escalate." },
+      { emoji: "↕️", name: "69, side-by-side", note: "playful, mutual, and energetic." },
+      { emoji: "👑", name: "Face-sitting — she's on top", note: "she's in control; bold but comfortable for her." },
+      { emoji: "🧎", name: "Oral with her standing, you kneeling", note: "a fun, daring change of position." },
+      { emoji: "🎢", name: "Oral warm-up, then switch it up", note: "tease first, then move into something livelier." }
     ],
     5: [
       { emoji: "🌉", name: "The bridge", note: "adventurous and bold — lean into her peak energy." },
@@ -334,7 +350,11 @@
       { emoji: "🌳", name: "Somewhere private and thrilling", note: "a daring change of scene, mindful of privacy." },
       { emoji: "🧊", name: "Sensory play (ice, feathers, temperature)", note: "tease the senses to amp up the adventure." },
       { emoji: "📆", name: "A planned 'date' with a build-up all day", note: "tease and anticipate, then go all out tonight." },
-      { emoji: "🔀", name: "Swap who's in control, taking turns leading", note: "trade the lead back and forth for a playful power game." }
+      { emoji: "🔀", name: "Swap who's in control, taking turns leading", note: "trade the lead back and forth for a playful power game." },
+      { emoji: "↕️", name: "69 with her on top", note: "an adventurous, fully-mutual twist." },
+      { emoji: "👑", name: "Face-sitting with hands held / light control", note: "bold and playful if you're both into it." },
+      { emoji: "⏳", name: "Oral edging — build up and pause", note: "tease to the brink and back for an intense build-up." },
+      { emoji: "🚿", name: "Oral in a new setting (shower, etc.)", note: "daring and spontaneous — change the scene." }
     ]
   };
 
