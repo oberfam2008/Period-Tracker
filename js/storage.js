@@ -1,4 +1,16 @@
-/* storage.js — localStorage persistence for Luna. */
+/* storage.js — local-first persistence for Luna.
+ *
+ * Data never leaves the device. The persistence backend is pluggable:
+ *   - Web (default): browser localStorage (synchronous).
+ *   - Mobile (Capacitor): if the @capacitor/preferences plugin is present,
+ *     it is detected automatically and used instead — durable native storage
+ *     that is NOT subject to browser cache eviction.
+ *
+ * Backends may be synchronous (localStorage) or asynchronous (Capacitor), so
+ * the data is hydrated once into an in-memory cache at startup via init().
+ * After that, load() is a synchronous read of the cache and save() writes
+ * through to the backend (awaitable, but callers can fire-and-forget).
+ */
 (function (global) {
   "use strict";
 
@@ -16,29 +28,97 @@
     encounters: []       // [{ id, date, desire:1-5, adventure:1-5, initiator:"her"|"him"|"mutual" }]
   };
 
-  function load() {
+  var cache = null;
+
+  function freshDefaults() {
+    return JSON.parse(JSON.stringify(DEFAULTS)); // deep copy so arrays aren't shared
+  }
+
+  function merge(parsed) {
+    return Object.assign(freshDefaults(), parsed || {});
+  }
+
+  function parse(raw) {
+    if (!raw) return freshDefaults();
+    try { return merge(JSON.parse(raw)); }
+    catch (e) { return freshDefaults(); }
+  }
+
+  /* ---- Pluggable backends ---- */
+
+  var localStorageBackend = {
+    name: "localStorage",
+    getItem: function (k) { try { return global.localStorage.getItem(k); } catch (e) { return null; } },
+    setItem: function (k, v) { try { global.localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    removeItem: function (k) { try { global.localStorage.removeItem(k); } catch (e) {} }
+  };
+
+  // Detect Capacitor Preferences (durable native storage) when running in a
+  // Capacitor app; otherwise fall back to localStorage. No code change needed
+  // to switch — wrapping the app with Capacitor + @capacitor/preferences is enough.
+  function detectBackend() {
     try {
-      var raw = global.localStorage.getItem(KEY);
-      if (!raw) return Object.assign({}, DEFAULTS);
-      var parsed = JSON.parse(raw);
-      return Object.assign({}, DEFAULTS, parsed);
-    } catch (e) {
-      return Object.assign({}, DEFAULTS);
-    }
+      var cap = global.Capacitor;
+      var P = cap && cap.Plugins && cap.Plugins.Preferences;
+      if (P) {
+        return {
+          name: "capacitor-preferences",
+          getItem: function (k) { return P.get({ key: k }).then(function (r) { return r.value; }); },
+          setItem: function (k, v) { return P.set({ key: k, value: v }).then(function () { return true; }); },
+          removeItem: function (k) { return P.remove({ key: k }); }
+        };
+      }
+    } catch (e) {}
+    return localStorageBackend;
+  }
+
+  var backend = detectBackend();
+
+  function setBackend(b) { backend = b; }
+  function backendName() { return backend.name; }
+
+  /* ---- Lifecycle ---- */
+
+  // Hydrate the in-memory cache from the backend. Returns a Promise<data>.
+  function init() {
+    return Promise.resolve(backend.getItem(KEY)).then(function (raw) {
+      cache = parse(raw);
+      return cache;
+    }).catch(function () {
+      cache = freshDefaults();
+      return cache;
+    });
+  }
+
+  function load() {
+    return cache || (cache = freshDefaults());
   }
 
   function save(data) {
-    try {
-      global.localStorage.setItem(KEY, JSON.stringify(data));
-      return true;
-    } catch (e) {
-      return false;
-    }
+    cache = data;
+    return Promise.resolve(backend.setItem(KEY, JSON.stringify(data)));
   }
 
   function clear() {
-    try { global.localStorage.removeItem(KEY); } catch (e) {}
+    cache = freshDefaults();
+    return Promise.resolve(backend.removeItem(KEY));
   }
 
-  global.Store = { load: load, save: save, clear: clear, DEFAULTS: DEFAULTS };
+  // Replace all data (used by Import). Merges with defaults, persists, returns it.
+  function replaceAll(parsed) {
+    cache = merge(parsed);
+    save(cache);
+    return cache;
+  }
+
+  global.Store = {
+    init: init,
+    load: load,
+    save: save,
+    clear: clear,
+    replaceAll: replaceAll,
+    setBackend: setBackend,
+    backendName: backendName,
+    DEFAULTS: DEFAULTS
+  };
 })(typeof window !== "undefined" ? window : this);

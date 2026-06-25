@@ -3,8 +3,8 @@
 A self-contained tracker that helps a partner understand and support the person
 whose cycle is being tracked, connecting **her cycle** with **moon phases** and
 **astrological star signs** for plain-language mood insights and practical,
-day-to-day tips. No accounts, no servers, no build step — data stays in the
-browser (`localStorage`).
+day-to-day tips. No accounts, no servers, no build step — your data stays
+**only on your device** (see [Data & storage](#-data--storage)).
 
 ## Features
 
@@ -48,6 +48,39 @@ largely drive it. Notes are scanned for a small mood vocabulary to surface
 - Name and **birthday** (drives your sun sign)
 - Default **cycle** and **period** lengths
 - Clear-all-data control
+
+## 🔒 Data & storage
+
+Luna is **local-first**: your data never leaves the device and is never uploaded
+anywhere. The persistence layer (`js/storage.js`) is a small pluggable backend:
+
+- **Web (default):** browser `localStorage`.
+- **Mobile (Capacitor):** if the app is wrapped with Capacitor and the
+  `@capacitor/preferences` plugin is present, it is **detected automatically**
+  and used instead — durable native storage that is *not* subject to browser
+  cache eviction. No code change is needed to switch.
+
+Because a backend may be synchronous (localStorage) or asynchronous (Capacitor),
+data is hydrated once into memory via `Store.init()` at startup; after that
+`load()` is a synchronous read and `save()` writes through to the backend.
+
+### Backup & restore
+
+Since the data is device-only, **Settings → Backup & restore** lets you:
+
+- **Export** all data to a JSON file (fully on-device, nothing is uploaded).
+- **Import** a previously exported file to restore it — also the simplest way to
+  move your data between devices without any cloud.
+
+Keep a backup occasionally: clearing browser data (or browser cache eviction on
+the web) can otherwise wipe local data.
+
+### Wrapping for mobile (later)
+
+Because the whole app is a self-contained static web app, the lightest path to
+Android/iOS is [Capacitor](https://capacitorjs.com/): add `@capacitor/core`,
+`@capacitor/preferences`, and the platform projects, point the webDir at this
+folder, and durable native storage turns on automatically via the detection above.
 
 ## Running it
 

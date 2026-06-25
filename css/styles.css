@@ -135,6 +135,18 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   color: var(--period);
   margin-left: 10px;
 }
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+.backup-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 12px 0 4px;
+}
+.storage-note { margin-top: 10px; }
 
 .log-row { display: flex; gap: 10px; align-items: flex-end; }
 .log-row input { margin-top: 0; }

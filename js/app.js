@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  var data = Store.load();
+  var data; // hydrated asynchronously in init() before anything renders
 
   /* Display name helpers (fall back gracefully when no name is set). */
   function herName() { return data.name ? escapeHtml(data.name) : "She"; }
@@ -758,6 +758,10 @@
     document.getElementById("set-period").value = data.periodLength;
     document.getElementById("set-intimacy").checked = data.showIntimacy !== false;
     document.getElementById("set-positions").checked = data.showPositions !== false;
+    var stored = Store.backendName() === "capacitor-preferences"
+      ? "Stored privately in durable device storage (Capacitor)."
+      : "Stored privately in this browser on this device (localStorage).";
+    document.getElementById("storage-note").textContent = "🔒 " + stored;
     updateSunPreview();
   }
 
@@ -883,6 +887,59 @@
       renderHistory();
       renderDaily();
     });
+
+    // Export: download all data as a JSON file (fully on-device, no network).
+    document.getElementById("set-export").addEventListener("click", function () {
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "luna-backup-" + toIso(new Date()) + ".json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      backupStatus("Backup downloaded ✓");
+    });
+
+    // Import: restore from a previously exported JSON file.
+    var fileInput = document.getElementById("set-import-file");
+    document.getElementById("set-import").addEventListener("click", function () {
+      fileInput.value = "";
+      fileInput.click();
+    });
+    fileInput.addEventListener("change", function () {
+      var file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        var parsed;
+        try { parsed = JSON.parse(reader.result); }
+        catch (e) { backupStatus("Couldn't read that file (not valid JSON).", true); return; }
+        if (!parsed || typeof parsed !== "object" ||
+            (parsed.periods && !Array.isArray(parsed.periods)) ||
+            (parsed.notes && !Array.isArray(parsed.notes)) ||
+            (parsed.encounters && !Array.isArray(parsed.encounters))) {
+          backupStatus("That doesn't look like a Luna backup.", true);
+          return;
+        }
+        if (!confirm("Importing will replace all current data with the backup. Continue?")) return;
+        data = Store.replaceAll(parsed);
+        renderSettings();
+        renderHistory();
+        renderJournal();
+        renderDaily();
+        backupStatus("Backup restored ✓");
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  function backupStatus(msg, isError) {
+    var s = document.getElementById("backup-status");
+    s.textContent = msg;
+    s.style.color = isError ? "var(--period)" : "var(--fertile)";
+    setTimeout(function () { s.textContent = ""; }, 4000);
   }
 
   function clampNum(v, min, max, fallback) {
@@ -892,11 +949,15 @@
   }
 
   function init() {
-    setupTabs();
-    setupHistoryControls();
-    setupJournalControls();
-    setupSettingsControls();
-    renderDaily();
+    // Hydrate data from the (possibly async) storage backend before rendering.
+    Store.init().then(function (loaded) {
+      data = loaded;
+      setupTabs();
+      setupHistoryControls();
+      setupJournalControls();
+      setupSettingsControls();
+      renderDaily();
+    });
   }
 
   document.addEventListener("DOMContentLoaded", init);

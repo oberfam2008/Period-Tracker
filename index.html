@@ -133,6 +133,18 @@
           <button id="set-clear" class="btn btn-danger">Clear all data</button>
           <span id="save-status" class="save-status"></span>
         </div>
+
+        <div class="card">
+          <h2>Backup &amp; restore</h2>
+          <p class="muted">Your data lives only on this device. Download a backup file to keep it safe or move it to another device — nothing is uploaded anywhere.</p>
+          <div class="backup-row">
+            <button id="set-export" class="btn btn-secondary">⬇️ Export backup</button>
+            <button id="set-import" class="btn btn-secondary">⬆️ Import backup</button>
+            <input type="file" id="set-import-file" accept="application/json,.json" hidden />
+          </div>
+          <span id="backup-status" class="save-status"></span>
+          <p class="muted storage-note" id="storage-note"></p>
+        </div>
       </section>
     </main>
 
