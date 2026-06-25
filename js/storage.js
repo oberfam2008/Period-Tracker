@@ -23,6 +23,8 @@
     periodLength: 5,
     showIntimacy: true,  // show the Intimacy outlook card on the Daily tab
     showPositions: true, // show the suggested-position idea within that card
+    lastBackupAt: "",    // ISO datetime of the last export, for the backup nudge
+    backupSnoozeUntil: "", // ISO datetime to suppress the backup nudge until
     periods: [],         // array of "YYYY-MM-DD" period start dates
     notes: [],           // [{ id, date, text }]
     encounters: []       // [{ id, date, desire:1-5, adventure:1-5, initiator:"her"|"him"|"mutual" }]

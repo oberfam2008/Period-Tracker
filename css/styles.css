@@ -148,6 +148,14 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 }
 .storage-note { margin-top: 10px; }
 
+/* Backup nudge */
+.nudge {
+  border: 1px solid var(--ovulation);
+  background: rgba(255,209,102,0.1);
+}
+.nudge-msg { margin-bottom: 12px; }
+.nudge-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
 .log-row { display: flex; gap: 10px; align-items: flex-end; }
 .log-row input { margin-top: 0; }
 .log-card .log-row { margin-top: 12px; }

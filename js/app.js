@@ -479,7 +479,7 @@
     var sunSign = data.birthday ? Astro.sunSign(new Date(data.birthday + "T00:00:00")) : null;
     var pred = Cycle.predict(data.periods, data, today);
 
-    var html = "";
+    var html = backupNudgeHtml();
     var title = data.name ? escapeHtml(data.name) + "'s day 🌙" : "Today 🌙";
 
     if (pred.hasData) {
@@ -550,6 +550,7 @@
     }
 
     container.innerHTML = html;
+    wireBackupNudge();
   }
 
   /* Cosmic reading when no cycle data is logged yet. */
@@ -890,15 +891,7 @@
 
     // Export: download all data as a JSON file (fully on-device, no network).
     document.getElementById("set-export").addEventListener("click", function () {
-      var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement("a");
-      a.href = url;
-      a.download = "luna-backup-" + toIso(new Date()) + ".json";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      exportBackup();
       backupStatus("Backup downloaded ✓");
     });
 
@@ -940,6 +933,65 @@
     s.textContent = msg;
     s.style.color = isError ? "var(--period)" : "var(--fertile)";
     setTimeout(function () { s.textContent = ""; }, 4000);
+  }
+
+  // Download all data as a JSON file and record the backup time.
+  function exportBackup() {
+    var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "luna-backup-" + toIso(new Date()) + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    data.lastBackupAt = new Date().toISOString();
+    data.backupSnoozeUntil = "";
+    Store.save(data);
+  }
+
+  // Decide whether to nudge the user to back up. Returns "" or a reason.
+  var BACKUP_STALE_DAYS = 14;
+  var BACKUP_SNOOZE_DAYS = 3;
+
+  function backupNudgeReason() {
+    var hasData = (data.periods.length + data.notes.length + data.encounters.length) > 0;
+    if (!hasData) return "";
+    var now = Date.now();
+    if (data.backupSnoozeUntil && now < Date.parse(data.backupSnoozeUntil)) return "";
+    if (!data.lastBackupAt) return "never";
+    var days = (now - Date.parse(data.lastBackupAt)) / 86400000;
+    return days >= BACKUP_STALE_DAYS ? "stale" : "";
+  }
+
+  function backupNudgeHtml() {
+    var reason = backupNudgeReason();
+    if (!reason) return "";
+    var msg = reason === "never"
+      ? "You haven't backed up yet. Your data lives only on this device — download a backup so you don't risk losing it."
+      : "It's been over " + BACKUP_STALE_DAYS + " days since your last backup. A quick export keeps your history safe.";
+    return '<div class="card nudge">' +
+      '<div class="nudge-msg">🔔 ' + msg + "</div>" +
+      '<div class="nudge-actions">' +
+        '<button id="nudge-backup" class="btn">Back up now</button>' +
+        '<button id="nudge-snooze" class="btn btn-secondary">Remind me later</button>' +
+      "</div>" +
+    "</div>";
+  }
+
+  function wireBackupNudge() {
+    var b = document.getElementById("nudge-backup");
+    if (b) b.addEventListener("click", function () {
+      exportBackup();
+      renderDaily();
+    });
+    var s = document.getElementById("nudge-snooze");
+    if (s) s.addEventListener("click", function () {
+      data.backupSnoozeUntil = new Date(Date.now() + BACKUP_SNOOZE_DAYS * 86400000).toISOString();
+      Store.save(data);
+      renderDaily();
+    });
   }
 
   function clampNum(v, min, max, fallback) {
