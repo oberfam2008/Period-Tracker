@@ -1,4 +1,4 @@
-/* storage.js — local-first persistence for Luna.
+/* storage.js — local-first persistence for HerRhythm.
  *
  * Data never leaves the device. The persistence backend is pluggable:
  *   - Web (default): browser localStorage (synchronous).
@@ -14,6 +14,8 @@
 (function (global) {
   "use strict";
 
+  // Storage key intentionally kept from the original "Luna" name so existing
+  // users' data survives the rebrand to HerRhythm. Do not rename without a migration.
   var KEY = "luna.data.v1";
 
   var DEFAULTS = {

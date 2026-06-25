@@ -1,10 +1,38 @@
-# 🌙 Luna — Period & Cosmic Tracker
+# HerRhythm — Cycle Companion
 
 A self-contained tracker that helps a partner understand and support the person
 whose cycle is being tracked, connecting **her cycle** with **moon phases** and
 **astrological star signs** for plain-language mood insights and practical,
 day-to-day tips. No accounts, no servers, no build step — your data stays
 **only on your device** (see [Data & storage](#-data--storage)).
+
+## 🎨 Design
+
+Grounded, masculine, and caring — like a thoughtful guide, not clinical or
+feminine. Earthy, nature-inspired palette (forest, slate, ember) on a warm,
+light background.
+
+| Token | Hex | Purpose |
+|---|---|---|
+| Deep Forest | `#3A4D3E` | Primary — buttons, active nav, headers |
+| Slate Ink | `#4A5A6F` | Secondary — calm/intelligent accents, luteal phase |
+| Warm Ember | `#C67C4E` | Accent — highlights, data, ovulation |
+| Charcoal | `#2A2A2D` | Primary text |
+| Stone Gray | `#9B9B9B` | Quiet captions |
+| Warm Gray | `#F4F1ED` | App background |
+| Off-White | `#FAFAF8` | Cards |
+
+Typography (loaded from Google Fonts in `index.html`):
+- **Cormorant Garamond** (600/700) — display: headers & emphasis
+- **Inter** (400/500/600) — body: main content
+- **IBM Plex Mono** (400) — data/captions: cycle numbers, tags, phase chips
+
+All colors and fonts are defined as CSS custom properties at the top of
+`css/styles.css`, so the whole app re-themes from one place.
+
+> Note: pure Stone Gray (`#9B9B9B`) fails contrast for small text on the light
+> background, so secondary text uses a slightly deeper stone (`--muted`) for
+> legibility; `#9B9B9B` (`--stone`) is reserved for larger/decorative captions.
 
 ## Features
 
@@ -51,7 +79,7 @@ largely drive it. Notes are scanned for a small mood vocabulary to surface
 
 ## 🔒 Data & storage
 
-Luna is **local-first**: your data never leaves the device and is never uploaded
+HerRhythm is **local-first**: your data never leaves the device and is never uploaded
 anywhere. The persistence layer (`js/storage.js`) is a small pluggable backend:
 
 - **Web (default):** browser `localStorage`.
@@ -107,7 +135,7 @@ wellness app.
 
 ## Disclaimer
 
-Luna is for personal reflection and entertainment. Cosmic insights are **not**
+HerRhythm is for personal reflection and entertainment. Cosmic insights are **not**
 medical advice, and predictions are estimates — do not rely on them for
 contraception or diagnosis.
 

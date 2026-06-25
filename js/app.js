@@ -913,7 +913,7 @@
             (parsed.periods && !Array.isArray(parsed.periods)) ||
             (parsed.notes && !Array.isArray(parsed.notes)) ||
             (parsed.encounters && !Array.isArray(parsed.encounters))) {
-          backupStatus("That doesn't look like a Luna backup.", true);
+          backupStatus("That doesn't look like a HerRhythm backup.", true);
           return;
         }
         if (!confirm("Importing will replace all current data with the backup. Continue?")) return;
@@ -941,7 +941,7 @@
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
-    a.download = "luna-backup-" + toIso(new Date()) + ".json";
+    a.download = "herrhythm-backup-" + toIso(new Date()) + ".json";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

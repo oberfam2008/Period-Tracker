@@ -1,29 +1,51 @@
 :root {
-  --bg: #12101f;
-  --bg-2: #1b1830;
-  --card: #221f3a;
-  --card-2: #2a2748;
-  --text: #ece9ff;
-  --muted: #9b96c4;
-  --accent: #b98cff;
-  --accent-2: #ff8cc8;
-  --period: #ff5d73;
-  --fertile: #4fd1c5;
-  --ovulation: #ffd166;
-  --border: #332f57;
+  /* HerRhythm palette — earthy, grounded, masculine (light theme) */
+  --primary: #3A4D3E;        /* Deep Forest — grounded, strong foundation */
+  --primary-press: #2F3F33;  /* pressed/active primary */
+  --secondary: #4A5A6F;      /* Slate Ink — intelligent, calm */
+  --accent: #C67C4E;         /* Warm Ember — warmth, care, energy */
+  --accent-2: #B06A3E;       /* deeper ember for hover/emphasis */
+
+  --text: #2A2A2D;           /* Charcoal — primary text & depth */
+  --muted: #6E6F73;          /* readable stone — secondary text (see note in README) */
+  --stone: #9B9B9B;          /* Stone Gray — quiet/decorative captions */
+
+  --bg: #F4F1ED;             /* Warm Gray — app background */
+  --card: #FAFAF8;           /* Off-White — cards */
+  --card-2: #F4F1ED;         /* warm-gray nested tiles inside cards */
+  --surface: #FFFFFF;        /* inputs / highest elevation */
+  --border: #E7E2DA;         /* hairline derived from warm gray */
+
+  /* Cycle-phase accents (nature-tied) */
+  --menstrual: #9E4A3C;      /* brick clay — rest & reset */
+  --follicular: #5A7355;     /* fresh green — rising energy */
+  --ovulation: #C67C4E;      /* ember — peak warmth */
+  --luteal: #4A5A6F;         /* slate — winding down */
+
+  /* Generic feedback mapped into the earthy register */
+  --period: #9E4A3C;         /* danger / "hold off" — brick */
+  --fertile: #5A7355;        /* positive / "good" — green */
+
   --radius: 16px;
-  --shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  --shadow: 0 6px 22px rgba(42, 42, 45, 0.08);
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
 
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: radial-gradient(1200px 600px at 50% -10%, #2a2150 0%, var(--bg) 55%);
+  font-family: var(--font-body);
+  background: var(--bg);
   color: var(--text);
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app {
@@ -34,15 +56,19 @@ body {
 
 .app-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 .app-header h1 {
   margin: 0;
-  font-size: 2.4rem;
-  letter-spacing: 1px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.9rem;
+  letter-spacing: 0.3px;
+  color: var(--primary);
 }
 .tagline {
   margin: 4px 0 0;
+  font-family: var(--font-body);
   color: var(--muted);
   font-style: italic;
 }
@@ -51,7 +77,8 @@ body {
 .tabs {
   display: flex;
   gap: 6px;
-  background: var(--bg-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   padding: 6px;
   border-radius: var(--radius);
   margin-bottom: 20px;
@@ -62,6 +89,7 @@ body {
   border: none;
   background: transparent;
   color: var(--muted);
+  font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 600;
   border-radius: 12px;
@@ -71,8 +99,8 @@ body {
 }
 .tab:hover { color: var(--text); }
 .tab.active {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #1a142b;
+  background: var(--primary);
+  color: var(--card);
 }
 
 /* Panels */
@@ -89,8 +117,21 @@ body {
   margin-bottom: 16px;
   box-shadow: var(--shadow);
 }
-.card h2 { margin: 0 0 12px; font-size: 1.15rem; }
-.card h3 { margin: 0 0 8px; font-size: 1rem; color: var(--accent); }
+.card h2 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  letter-spacing: 0.2px;
+  color: var(--text);
+}
+.card h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--primary);
+}
 
 .muted { color: var(--muted); font-size: 0.9rem; }
 
@@ -108,10 +149,11 @@ input[type="date"] {
   width: 100%;
   margin-top: 6px;
   padding: 12px;
-  background: var(--bg-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
+  font-family: var(--font-body);
   font-size: 1rem;
 }
 input:focus { outline: 2px solid var(--accent); border-color: transparent; }
@@ -120,10 +162,11 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   padding: 12px 18px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: #1a142b;
+  background: var(--primary);
+  color: var(--card);
+  font-family: var(--font-body);
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: transform 0.1s ease, filter 0.1s ease;
 }
@@ -150,8 +193,8 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
 /* Backup nudge */
 .nudge {
-  border: 1px solid var(--ovulation);
-  background: rgba(255,209,102,0.1);
+  border: 1px solid var(--accent);
+  background: rgba(198, 124, 78, 0.08);
 }
 .nudge-msg { margin-bottom: 12px; }
 .nudge-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -165,29 +208,31 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 /* Daily hero */
 .hero {
   text-align: center;
-  background: linear-gradient(135deg, var(--card-2), var(--card));
+  background: var(--surface);
 }
 .cycle-day {
-  font-size: 3.2rem;
-  font-weight: 800;
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 400;
   margin: 6px 0 0;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--accent);
+  letter-spacing: 1px;
 }
 .phase-badge {
   display: inline-block;
-  padding: 6px 14px;
+  padding: 6px 13px;
   border-radius: 999px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.74rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 8px;
 }
-.phase-menstrual { background: rgba(255,93,115,0.18); color: var(--period); }
-.phase-follicular { background: rgba(79,209,197,0.18); color: var(--fertile); }
-.phase-ovulation  { background: rgba(255,209,102,0.2); color: var(--ovulation); }
-.phase-luteal     { background: rgba(185,140,255,0.2); color: var(--accent); }
+.phase-menstrual  { background: rgba(158, 74, 60, 0.12);  color: #8A3F33; }
+.phase-follicular { background: rgba(90, 115, 85, 0.16);  color: #46583F; }
+.phase-ovulation  { background: rgba(198, 124, 78, 0.16); color: #A85F38; }
+.phase-luteal     { background: rgba(74, 90, 111, 0.14);  color: #41506A; }
 
 /* Cosmic row */
 .cosmic-grid {
@@ -203,9 +248,16 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   border-radius: var(--radius);
 }
 .cosmic-tile .glyph { font-size: 2.4rem; line-height: 1; }
-.cosmic-tile .label { color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
-.cosmic-tile .value { font-weight: 700; font-size: 1.05rem; margin-top: 2px; }
-.cosmic-tile .sub { color: var(--muted); font-size: 0.8rem; }
+.cosmic-tile .label {
+  font-family: var(--font-mono);
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+.cosmic-tile .value { font-weight: 600; font-size: 1.05rem; margin-top: 2px; color: var(--text); }
+.cosmic-tile .sub { font-family: var(--font-mono); color: var(--muted); font-size: 0.72rem; }
 
 .insight p { margin: 0 0 10px; }
 .insight p:last-child { margin-bottom: 0; }
@@ -219,11 +271,11 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   text-align: center;
 }
 .pred-tile { padding: 14px 8px; border-radius: 12px; background: var(--card-2); border: 1px solid var(--border); }
-.pred-tile .big { font-size: 1.5rem; font-weight: 800; margin-top: 4px; }
-.pred-tile .lbl { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.pred-tile .big { font-family: var(--font-mono); font-size: 1.35rem; font-weight: 400; margin-top: 4px; color: var(--text); }
+.pred-tile .lbl { font-family: var(--font-mono); color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; }
 .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px; vertical-align:middle; }
-.dot-period { background: var(--period); }
-.dot-fertile { background: var(--fertile); }
+.dot-period { background: var(--menstrual); }
+.dot-fertile { background: var(--follicular); }
 .dot-ovulation { background: var(--ovulation); }
 
 /* History list */
@@ -232,12 +284,12 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: var(--card);
+  background: var(--card-2);
   border: 1px solid var(--border);
   border-radius: 12px;
   margin-bottom: 8px;
 }
-.history-item .meta { color: var(--muted); font-size: 0.85rem; }
+.history-item .meta { font-family: var(--font-mono); color: var(--muted); font-size: 0.8rem; }
 .history-item button {
   background: transparent;
   border: none;
@@ -258,10 +310,10 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   border-radius: 12px;
   border: 1px solid var(--border);
 }
-.tips-good { background: rgba(79,209,197,0.08); border-color: rgba(79,209,197,0.35); }
-.tips-hold { background: rgba(255,93,115,0.08); border-color: rgba(255,93,115,0.35); }
-.tips-good h3 { color: var(--fertile); }
-.tips-hold h3 { color: var(--period); }
+.tips-good { background: rgba(90, 115, 85, 0.10); border-color: rgba(90, 115, 85, 0.30); }
+.tips-hold { background: rgba(158, 74, 60, 0.08); border-color: rgba(158, 74, 60, 0.30); }
+.tips-good h3 { color: #46583F; }
+.tips-hold h3 { color: #8A3F33; }
 .tip-list { list-style: none; padding: 0; margin: 0; }
 .tip-list li {
   padding: 8px 0;
@@ -288,11 +340,13 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   text-align: center;
   padding: 12px;
   border-radius: 12px;
-  font-size: 1.05rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.35rem;
   margin-bottom: 16px;
 }
-.intimacy-green { background: rgba(79,209,197,0.15); color: var(--fertile); border: 1px solid rgba(79,209,197,0.4); }
-.intimacy-amber { background: rgba(255,209,102,0.14); color: var(--ovulation); border: 1px solid rgba(255,209,102,0.4); }
+.intimacy-green { background: rgba(90, 115, 85, 0.14); color: #46583F; border: 1px solid rgba(90, 115, 85, 0.4); }
+.intimacy-amber { background: rgba(198, 124, 78, 0.14); color: #A85F38; border: 1px solid rgba(198, 124, 78, 0.4); }
 .intimacy-meters { margin-bottom: 14px; }
 .im-row {
   display: flex;
@@ -307,8 +361,8 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 .im-word { font-weight: 700; }
 .im-note { margin-top: 12px; font-size: 0.82rem; border-top: 1px dashed var(--border); padding-top: 10px; }
 .learned-note {
-  background: rgba(185,140,255,0.12);
-  border: 1px solid rgba(185,140,255,0.3);
+  background: rgba(74, 90, 111, 0.10);
+  border: 1px solid rgba(74, 90, 111, 0.28);
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 0.9rem;
@@ -319,10 +373,10 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   margin-top: 14px;
   padding: 14px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255,140,200,0.12), rgba(185,140,255,0.12));
-  border: 1px solid rgba(255,140,200,0.35);
+  background: linear-gradient(135deg, rgba(198, 124, 78, 0.12), rgba(58, 77, 62, 0.10));
+  border: 1px solid rgba(198, 124, 78, 0.30);
 }
-.position-block h3 { margin: 0 0 6px; color: var(--accent-2); }
+.position-block h3 { margin: 0 0 6px; color: var(--accent); }
 .position-block p { margin: 0 0 6px; }
 .position-block p:last-child { margin-bottom: 0; }
 .pos-emoji { font-size: 1.3rem; }
@@ -333,12 +387,12 @@ textarea {
   width: 100%;
   margin-top: 6px;
   padding: 12px;
-  background: var(--bg-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
   font-size: 1rem;
-  font-family: inherit;
+  font-family: var(--font-body);
   resize: vertical;
 }
 textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
@@ -347,10 +401,11 @@ select {
   width: 100%;
   margin-top: 6px;
   padding: 12px;
-  background: var(--bg-2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
   color: var(--text);
+  font-family: var(--font-body);
   font-size: 1rem;
 }
 
@@ -361,7 +416,7 @@ select {
   border-bottom: 1px dashed var(--border);
 }
 .pattern-row:last-of-type { border-bottom: none; }
-.pattern-stage { width: 110px; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+.pattern-stage { width: 110px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
 .pattern-data { font-size: 0.9rem; }
 
 .journal-item {
@@ -391,13 +446,11 @@ select {
 .phase-tag {
   padding: 2px 10px;
   border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
-.phase-menstrual { background: rgba(255,93,115,0.18); color: var(--period); }
-.phase-follicular { background: rgba(79,209,197,0.18); color: var(--fertile); }
-.phase-ovulation { background: rgba(255,209,102,0.2); color: var(--ovulation); }
-.phase-luteal { background: rgba(185,140,255,0.2); color: var(--accent); }
 
 .app-footer { margin-top: 24px; text-align: center; }
 
