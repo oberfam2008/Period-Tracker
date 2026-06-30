@@ -770,13 +770,13 @@
 
     function list(items) {
       return "<ul class=\"tip-list\">" +
-        items.map(function (i) { return "<li>" + i + "</li>"; }).join("") +
+        items.map(function (i) { return "<li>" + stripLeadEmoji(i) + "</li>"; }).join("") +
         "</ul>";
     }
 
     return '<div class="tips-cols">' +
-      '<div class="tips-col tips-good"><h3>👍 Good ideas today</h3>' + list(good) + "</div>" +
-      '<div class="tips-col tips-hold"><h3>✋ Maybe hold off on</h3>' + list(hold) + "</div>" +
+      '<div class="tips-col tips-good"><h3>Good ideas today</h3>' + list(good) + "</div>" +
+      '<div class="tips-col tips-hold"><h3>Maybe hold off on</h3>' + list(hold) + "</div>" +
     "</div>";
   }
 
@@ -944,8 +944,8 @@
     var comfort = (stageKey === "menstrual" || stageKey === "luteal_late")
       ? " Keep it gentle and let her steer — comfort comes first today."
       : "";
-    return '<div class="position-block"><h3>🛏️ Position idea for today</h3>' +
-      '<p><span class="pos-emoji">' + pick.emoji + "</span> <strong>" + pick.name + "</strong> — " +
+    return '<div class="position-block"><h3>Position idea for today</h3>' +
+      '<p><strong>' + pick.name + "</strong> — " +
       pick.note + comfort + "</p>" +
       '<p class="muted">Just a playful suggestion tuned to the day\'s mood — never a script. Follow what you\'re both into.</p>' +
     "</div>";
@@ -956,12 +956,12 @@
     return (pred.daysUntilNext <= 4) ? "luteal_late" : "luteal_early";
   }
 
-  function meter(filled, icon) {
+  function meter(filled) {
     var out = "";
     for (var i = 1; i <= 5; i++) {
-      out += '<span class="pip' + (i <= filled ? "" : " pip-dim") + '">' + icon + "</span>";
+      out += '<span class="seg' + (i <= filled ? " on" : "") + '"></span>';
     }
-    return '<span class="meter">' + out + "</span>";
+    return '<span class="bars">' + out + "</span>";
   }
 
   var INITIATOR_TEXT = {
@@ -1019,10 +1019,10 @@
       "</div>" +
       '<div class="intimacy-meters">' +
         '<div class="im-row"><span class="im-label">Likely desire</span>' +
-          meter(desire, "🔥") +
+          meter(desire) +
           '<span class="im-word">' + DESIRE_WORDS[desire] + "</span></div>" +
         '<div class="im-row"><span class="im-label">Adventurousness</span>' +
-          meter(adventure, "🌶️") +
+          meter(adventure) +
           '<span class="im-word">' + ADVENTURE_WORDS[adventure] + "</span></div>" +
       "</div>" +
       "<p>" + info.tip + "</p>" +
@@ -1115,7 +1115,7 @@
     runReminders(pred, today);
 
     var html = backupNudgeHtml();
-    var title = data.name ? escapeHtml(data.name) + "'s day 🌙" : "Today 🌙";
+    var title = data.name ? escapeHtml(data.name) + "'s day" : "Today";
 
     if (pred.hasData) {
       var nextLine = pred.isLate
@@ -1158,7 +1158,7 @@
     if (sunSign) {
       html += '<div class="cosmic-grid" style="margin-top:14px">' +
         cosmicTile(sunSign.glyph, "Her Sun Sign", sunSign.name, sunSign.element + " element") +
-        cosmicTile("✨", "Element Balance", sunSign.element + " + " + moonSignObj.element,
+        cosmicTile("◇", "Element Balance", sunSign.element + " + " + moonSignObj.element,
           sunSign.element === moonSignObj.element ? "Amplified" : "Blended") +
         "</div>";
     }
@@ -1166,7 +1166,7 @@
 
     // Cosmic mood insight (always shown, with or without cycle data)
     var insightPhase = pred.hasData ? pred.phase : { key: "follicular", label: "Follicular" };
-    html += '<div class="card insight"><h2>🔮 Cosmic mood</h2>';
+    html += '<div class="card insight"><h2>Cosmic mood</h2>';
     if (pred.hasData) {
       html += buildInsight(pred, moon, sunSign, moonSignObj);
     } else {
@@ -1176,7 +1176,7 @@
     html += "</div>";
 
     // Practical tips for the partner
-    html += '<div class="card tips"><h2>💡 Tips &amp; ideas for today</h2>' +
+    html += '<div class="card tips"><h2>Tips &amp; ideas for today</h2>' +
       '<p class="muted">Simple, practical ways to support ' + herLower() + " today.</p>" +
       buildTips(insightPhase, moon, sunSign) +
     "</div>";
@@ -1186,11 +1186,11 @@
       if (pred.hasData) {
         var learned = Learn.analyze(data);
         var stageKey = intimacyStage(pred);
-        html += '<div class="card intimacy"><h2>💞 Intimacy outlook</h2>' +
+        html += '<div class="card intimacy"><h2>Intimacy outlook</h2>' +
           buildIntimacy(pred, moon, learned.encounters[stageKey], learned.notes[stageKey], data.showPositions !== false) +
         "</div>";
       } else {
-        html += '<div class="card intimacy"><h2>💞 Intimacy outlook</h2>' +
+        html += '<div class="card intimacy"><h2>Intimacy outlook</h2>' +
           '<p class="muted">Log her period in the History tab to unlock the intimacy outlook — ' +
           "desire and adventurousness track the cycle, so it needs a cycle day to work.</p>" +
         "</div>";
@@ -1748,6 +1748,11 @@
     return String(s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
+  }
+
+  // Remove a leading emoji/symbol run (used to de-emoji tip text at render time).
+  function stripLeadEmoji(s) {
+    return String(s).replace(/^[\p{Extended_Pictographic}️‍\s]+/u, "");
   }
 
   /* ---------- Wiring ---------- */
