@@ -261,7 +261,16 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 
 .insight p { margin: 0 0 10px; }
 .insight p:last-child { margin-bottom: 0; }
-.insight .lead { font-size: 1.05rem; }
+.insight .lead { font-size: 1.15rem; font-family: var(--font-display); font-weight: 600; color: var(--primary); line-height: 1.35; }
+.insight .aphorism {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--accent-2);
+  border-top: 1px dashed var(--border);
+  padding-top: 12px;
+  margin-top: 4px;
+}
 
 /* Predictions */
 .pred-grid {

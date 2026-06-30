@@ -16,113 +16,495 @@
 
   /* ---------- Insight engine ---------- */
 
-  var PHASE_MOOD = {
+  /* ---------- Cosmic mood content pools ----------
+   * The daily reading is assembled Co-Star style: each "slot" (glance, phase
+   * body, sub-stage, moon, sign, balance, throughline, aphorism) is drawn from
+   * a pool with a date-seeded RNG. Combined with the dynamic cycle-day detail,
+   * the result is effectively non-repeating day to day.
+   */
+  var PHASE_TITLE = {
+    menstrual: "Rest & Recovery",
+    follicular: "Rising Energy",
+    ovulation: "Peak & Outgoing",
+    luteal: "Winding Down"
+  };
+
+  // Short, evocative opening line (the "day at a glance").
+  var GLANCE = {
+    menstrual: [
+      "She's running on a lower, quieter frequency today.",
+      "Her body is asking for less, not more.",
+      "This is a week for retreat, and she feels it.",
+      "Energy is scarce; tenderness is the currency that counts.",
+      "She's turned inward, conserving what she has.",
+      "The volume of her world wants turning down today.",
+      "Comfort outranks everything else right now.",
+      "She's in the rest phase — meet her there, gently.",
+      "Small and soft beats big and bright today.",
+      "Her reserves are low; don't ask her to spend them.",
+      "The pull today is toward stillness and warmth.",
+      "She's recovering — patience reads as love this week."
+    ],
+    follicular: [
+      "Something in her is waking back up.",
+      "Her energy is on the rise, and so is her openness.",
+      "The door is open today — to ideas, to plans, to you.",
+      "She's building momentum; lean into it with her.",
+      "Fresh starts feel possible to her right now.",
+      "Curiosity is back online for her today.",
+      "She's reaching outward again after the quiet.",
+      "There's a lift in her step that wasn't there last week.",
+      "Optimism comes easily to her in this stretch.",
+      "She's game — a good day to ask, suggest, invite.",
+      "Her appetite for the new is climbing.",
+      "The brightening has begun; ride it with her."
+    ],
+    ovulation: [
+      "She's at the top of her arc today.",
+      "This is her most magnetic, open window of the month.",
+      "Confidence and warmth are pouring off her.",
+      "She's lit up — connection is effortless right now.",
+      "Today she's at her most present and alive.",
+      "Her social, expressive self is fully switched on.",
+      "The peak is here; she feels it and so will you.",
+      "She's radiating; don't waste the day on logistics.",
+      "Closeness comes easily — she's reaching for it too.",
+      "This is the brightest the cycle gets — show up for it.",
+      "Her energy is generous today; match it.",
+      "Everything in her is turned outward and warm."
+    ],
+    luteal: [
+      "The tide is going out; she's turning inward again.",
+      "Her patience is thinner than it was a week ago.",
+      "She's winding down, and the small stuff lands harder.",
+      "Sensitivity is up; tread a little softer today.",
+      "The bright stretch is behind her — comfort is back on the menu.",
+      "She's conserving again; don't add to the load.",
+      "Feelings sit closer to the surface for her now.",
+      "This is the part of the cycle that needs your steadiness.",
+      "She's more easily worn down today — buffer her from friction.",
+      "The mood can turn quickly now; be the calm constant.",
+      "Her bandwidth is shrinking; protect it.",
+      "Reassurance goes further than anything else this week."
+    ]
+  };
+
+  // Longer descriptive body for the phase.
+  var PHASE_BODY = {
+    menstrual: [
+      "Her energy is likely at its lowest as her body resets — expect more fatigue, possible cramps, and a pull to retreat. Comfort and quiet are your best tools.",
+      "This is the reset point of her cycle. Hormones are at their floor, which usually means low energy and a shorter fuse for hassle.",
+      "Her body is doing quiet, demanding work right now. Tiredness and tenderness are normal; ease the day wherever you can.",
+      "The first phase asks for rest. She may want less conversation, fewer plans, and more permission to do nothing.",
+      "Physically she's depleted and may be uncomfortable. Practical care lands better than grand gestures this week.",
+      "She's likely sensitive and low on reserves. A calm, predictable environment does more for her than anything flashy.",
+      "Comfort is the whole assignment today — warmth, rest, and being left genuinely off the hook.",
+      "Her system is in recovery mode. Expect her to want to cocoon, and make that easy for her."
+    ],
+    follicular: [
+      "Estrogen is climbing and her mood is rising with it. She tends to feel more open, optimistic, and game for new things now.",
+      "This is the bright, building stretch. Energy, focus, and sociability are all on the way up.",
+      "Her body is gearing up toward ovulation — confidence, creativity, and a willingness to say yes are returning.",
+      "The fog of the last phase is lifting. She's re-emerging, with more drive and more patience.",
+      "Momentum is the theme. Ideas feel possible to her and her appetite for activity is growing.",
+      "She's increasingly outward-facing and receptive — a naturally good window for plans and connection.",
+      "Her energy is fresh and rising; she'll likely welcome a little novelty and a change of scene.",
+      "This is the upswing of the month — motivation and optimism are both trending up for her."
+    ],
+    ovulation: [
+      "She's likely at her most confident, social, and affectionate. Connection and conversation come easily — the warmest window of the month.",
+      "This is the high point of her cycle: energy, mood, and magnetism all peak around now.",
+      "Her body is at its most outgoing and open. Expect her at her most expressive, generous, and present.",
+      "Everything is turned outward today — she's drawn to people, closeness, and warmth.",
+      "Hormonally this is the crest. She's likely feeling her best and most alive.",
+      "Her confidence and sociability are peaking; she's reaching for connection, not retreating from it.",
+      "This is the most magnetic stretch of the month — she's open and easy to be close to.",
+      "Her self-assurance is at its height. Meet her energy and the day takes care of itself."
+    ],
+    luteal: [
+      "Hormones are shifting and her focus turns inward. She may be more sensitive, tired, or easily irritated — patience matters most now.",
+      "Past ovulation, her body begins to wind down. Expect a gradual dip in energy and a lower tolerance for friction.",
+      "Progesterone is rising, which often brings a quieter, more inward, sometimes touchier mood.",
+      "The bright phase is over; she's drawing inward again and the small stuff weighs more.",
+      "This is the part of the cycle where reassurance matters. She may feel stretched thin and need you to be steady.",
+      "Her bandwidth is shrinking. Pre-empting stress does more good now than fixing a mood after it lands.",
+      "Sensitivity climbs through this phase, peaking just before her period. Soften your edges and lighten her load.",
+      "She's turning toward comfort and security. Predictable, low-friction days serve her best right now."
+    ]
+  };
+
+  // Sub-stage nuance (early/mid/late within the phase; ovulation = peak).
+  var STAGE_NOTE = {
     menstrual: {
-      title: "Rest & Recovery",
-      body: "Her energy is likely at its lowest as her body resets. She may feel tired, crampy, or want to retreat from the world. Comfort, quiet, and low-key plans are your friend this week."
+      early: [
+        "The first day or two are usually the heaviest — keep expectations low and handle what you can without being asked.",
+        "Right at the start, discomfort and tiredness tend to peak; a hands-on, no-questions approach helps most.",
+        "These opening days are the most draining of the cycle — make them as easy as possible for her."
+      ],
+      mid: [
+        "She's a few days in now; the worst may be easing but energy is still low.",
+        "Mid-period, she may start feeling a little more herself — follow her lead rather than pushing.",
+        "The middle of her period is steadier than the start, but comfort still wins the day."
+      ],
+      late: [
+        "Her period is winding down and energy is about to start climbing — you may notice her brightening over the next day or two.",
+        "The tail end: a good moment to gently reintroduce light plans as she comes back online.",
+        "She's nearly through it; the upswing is just ahead."
+      ]
     },
     follicular: {
-      title: "Rising Energy",
-      body: "Estrogen is climbing and her mood and energy are rising with it. She tends to feel more open, optimistic, and up for new things right now — a naturally bright stretch."
+      early: [
+        "Just out of her period, she's re-emerging — a good time to gently float plans and see what sticks.",
+        "Energy is freshly returning; she may welcome light activity and a change of scene.",
+        "Early follicular is a soft restart — she's warming back up to the world."
+      ],
+      mid: [
+        "She's in the sweet spot of this phase — motivated, capable, and up for things.",
+        "Momentum is building nicely; a strong window for plans, projects, and connection.",
+        "Mid-follicular, she's likely at an easy, capable cruise."
+      ],
+      late: [
+        "She's approaching ovulation — energy and openness are nearing their peak over the next few days.",
+        "The run-up to ovulation: her confidence and drive are cresting.",
+        "Late follicular — she's almost at her high point; momentum is strong."
+      ]
     },
     ovulation: {
-      title: "Peak & Outgoing",
-      body: "She's likely at her most confident, social, and affectionate. Connection and conversation come easily — this is the warmest, most magnetic window of the month."
+      peak: [
+        "This is the day or two it all crests — make the most of it.",
+        "Right at the peak: she's likely feeling her best, so meet her there.",
+        "Her arc tops out right about now — the warmest, brightest window."
+      ]
     },
     luteal: {
-      title: "Winding Down",
-      body: "Hormones are shifting and the world turns inward for her. She may be more sensitive, tired, or easily irritated — especially in the few days right before her period. Patience matters most now."
+      early: [
+        "Early luteal is usually still pretty steady — a calm, pleasant stretch before things get more tender.",
+        "Just after ovulation she often still feels good; enjoy the easy window while it lasts.",
+        "The first part of luteal is gentle — the dip hasn't really set in yet."
+      ],
+      mid: [
+        "Mid-luteal, you may notice energy dipping and patience getting shorter — start easing the load.",
+        "Things are turning inward now; pre-empt stress and keep the week manageable.",
+        "The wind-down is underway — soften the schedule where you can."
+      ],
+      late: [
+        "These last few days before her period are the classic PMS window — sensitivity and fatigue can spike, so lead with gentleness.",
+        "Right before her period, expect the strongest dip; extra patience and comfort go a long way now.",
+        "Late luteal is the most tender stretch — be the steady, calm one this week."
+      ]
     }
   };
 
-  var MOON_MOOD = {
-    "New Moon": "a fresh start and quiet intentions",
-    "Waxing Crescent": "gentle, building momentum",
-    "First Quarter": "drive and a push to take action",
-    "Waxing Gibbous": "focus and fine-tuning",
-    "Full Moon": "heightened emotions and intensity — feelings run bright",
-    "Waning Gibbous": "reflection and gratitude",
-    "Last Quarter": "letting go and clearing space",
-    "Waning Crescent": "rest, retreat, and recharging"
+  // Co-Star-style punchy closer, addressed to the partner.
+  var APHORISM = {
+    menstrual: [
+      "Today, doing less for her is doing more.",
+      "Care doesn't have to be loud to be felt.",
+      "Be the soft place, not another thing to manage.",
+      "What she needs today is subtraction, not addition.",
+      "Comfort is a language; speak it fluently.",
+      "Show up quietly and stay.",
+      "The right move is the gentle one.",
+      "Make her world smaller and warmer today.",
+      "Rest is productive. Let her have it.",
+      "Hold the space; don't try to fix it.",
+      "Your patience is the gift today.",
+      "Lower the stakes on everything you can."
+    ],
+    follicular: [
+      "Say yes to the thing she's curious about.",
+      "Momentum likes company — go with her.",
+      "This is a day to build, not to wait.",
+      "Match her energy and watch it grow.",
+      "Open doors while they're open.",
+      "Plant something today; it'll take root now.",
+      "Be a little spontaneous; she's ready for it.",
+      "Curiosity is contagious — catch it.",
+      "Don't overthink it. Just suggest the thing.",
+      "Her yes is easier to earn this week — ask.",
+      "Lean into the upswing with her.",
+      "Fresh beats familiar today."
+    ],
+    ovulation: [
+      "Don't spend her best day on small things.",
+      "Be present; that's the whole assignment.",
+      "Reach for her — she's reaching too.",
+      "Make a memory, not a to-do list.",
+      "Warmth answered with warmth compounds.",
+      "This is the day to choose her out loud.",
+      "Put the phone down and look at her.",
+      "Say the thing you appreciate — today it lands.",
+      "Connection is the easiest it'll be all month.",
+      "Show up like it's a date, because it is.",
+      "Generosity meets generosity today.",
+      "Don't let the peak pass unmarked."
+    ],
+    luteal: [
+      "Be the calm she can borrow.",
+      "Don't take the weather personally.",
+      "Steadiness is the kindest thing you can offer now.",
+      "Lighten the load before she has to ask.",
+      "Choose patience over being right.",
+      "Soften your edges; hers are already raw.",
+      "Protect her peace today.",
+      "Reassurance costs little and means a lot now.",
+      "Anticipate, don't react.",
+      "Make the day quieter than it wants to be.",
+      "Hold steady while she rides it out.",
+      "Comfort first; everything else can wait."
+    ]
   };
 
-  /* How her SUN-sign element tends to color her temperament. */
-  var SUN_ELEMENT = {
-    Fire:  "Her fire sign craves action and passion — restlessness often shows up as a need to move, do, or get out of the house.",
-    Earth: "Her earth sign craves stability and comfort — small, reliable gestures mean more to her than grand ones.",
-    Air:   "Her air sign lives in ideas and conversation — she'll want to talk things through and feel mentally engaged.",
-    Water: "Her water sign feels everything deeply — emotions run close to the surface and need room to be felt."
+  var GLANCE_GENERIC = [
+    "Here's the cosmic weather for her today.",
+    "A read on the day's energy, straight from the Moon.",
+    "Today's tone, set by the Moon overhead.",
+    "The Moon's setting the mood — here's the gist.",
+    "What the day's sky is whispering about her mood.",
+    "A quick celestial read for the two of you today.",
+    "The Moon's the headline today; here's the forecast.",
+    "The sky's mood is worth reading even before her cycle is dialed in."
+  ];
+
+  var APHORISM_GENERIC = [
+    "Pay attention to her signals; the sky only sketches the outline.",
+    "Read the room, then read the stars.",
+    "Let the Moon hint, but let her tell you the truth.",
+    "The chart suggests; she decides.",
+    "Use this as a nudge, not a verdict.",
+    "Notice more than you assume today.",
+    "The best forecast is still paying attention.",
+    "Curiosity beats certainty — with the stars and with her."
+  ];
+
+  // Per-moon-phase phrasings.
+  var MOON_PHASE_LINES = {
+    "New Moon": [
+      "tonight's New Moon carries a fresh-start, reset energy",
+      "the New Moon leans quiet and inward — a night for low light and small intentions",
+      "under the dark New Moon, the mood is private and slow"
+    ],
+    "Waxing Crescent": [
+      "the Waxing Crescent carries gentle, building momentum",
+      "a young Moon is gathering — small steps and quiet motivation",
+      "the crescent leans hopeful and forward-tilting"
+    ],
+    "First Quarter": [
+      "the First Quarter Moon pushes toward decision and action",
+      "this half Moon carries friction and drive in equal measure",
+      "the First Quarter leans restless — energy looking for a direction"
+    ],
+    "Waxing Gibbous": [
+      "the Waxing Gibbous carries focus and fine-tuning energy",
+      "an almost-full Moon — anticipation and momentum are high",
+      "the gibbous Moon leans intense and building"
+    ],
+    "Full Moon": [
+      "tonight's Full Moon turns the emotional volume all the way up",
+      "under the Full Moon, feelings run bright and close to the surface",
+      "the Full Moon carries heightened intensity — beautiful and a little raw"
+    ],
+    "Waning Gibbous": [
+      "the Waning Gibbous carries reflection and a settling-down energy",
+      "just past full, the Moon leans toward gratitude and release",
+      "the waning gibbous mood is softer and more contemplative"
+    ],
+    "Last Quarter": [
+      "the Last Quarter Moon is about letting go and clearing space",
+      "this half Moon leans toward release and honest reckoning",
+      "the Last Quarter carries a turning-inward, tidying energy"
+    ],
+    "Waning Crescent": [
+      "the Waning Crescent leans toward rest, retreat, and recharging",
+      "the old Moon is nearly gone — a low, quiet, restorative tone",
+      "the waning crescent carries surrender and stillness"
+    ]
   };
 
   /* How the MOON-sign element colors her emotional weather today. */
   var MOON_ELEMENT = {
-    Fire:  "energetic and quick to react",
-    Earth: "steady and seeking comfort",
-    Air:   "social, talkative, and a little restless",
-    Water: "tender, intuitive, and emotionally open"
+    Fire:  ["energetic and quick to react", "lively, impatient, and ready for action", "warm but easily sparked"],
+    Earth: ["steady and seeking comfort", "grounded, a little stubborn, and comfort-seeking", "practical and slow to be moved"],
+    Air:   ["social, talkative, and a little restless", "chatty, curious, and up in her head", "light, mental, and easily distracted"],
+    Water: ["tender, intuitive, and emotionally open", "deeply feeling and easily moved", "sensitive, dreamy, and close to her emotions"]
   };
 
-  /* Interpret the blend of her sun element and today's moon element. */
-  function balanceText(sunEl, moonEl) {
-    if (sunEl === moonEl) {
-      return "Her core nature and today's mood are both <strong>" + sunEl +
-        "</strong> — that energy is amplified, so expect a strong dose of it.";
-    }
-    var pair = [sunEl, moonEl].sort().join("-");
-    var map = {
-      "Air-Fire": "Fire and Air feed each other — she's expressive, lively, and ready to engage. Match her spark.",
-      "Earth-Water": "Earth and Water nourish each other — a grounded, nurturing mood. Cozy, caring gestures land well.",
-      "Fire-Water": "Fire meets Water — passion and deep feeling can clash into steam. Emotions may run hot; stay calm and don't take heat personally.",
-      "Earth-Fire": "Fire meets Earth — drive versus caution. She may feel pulled between wanting to act and wanting to stay safe; don't rush her.",
-      "Air-Earth": "Air meets Earth — restlessness versus routine. Give her both a little novelty and a little stability.",
-      "Air-Water": "Air meets Water — thoughts versus feelings. She may want to talk and feel at the same time; listen first, solve later."
-    };
-    return map[pair] || "Her sun and the moon mix two different energies today — expect a blend of both.";
+  /* How her SUN-sign element tends to color her temperament. */
+  var SUN_ELEMENT = {
+    Fire: [
+      "As a fire sign, she runs on momentum — when she's restless, a shared activity or a change of scene helps more than sitting still.",
+      "Her fire nature craves action and passion; she'd rather do something than talk about it.",
+      "Fire signs lead with instinct and drive — give her room to move and a reason to chase."
+    ],
+    Earth: [
+      "As an earth sign, she values dependability — showing up consistently speaks louder than any grand gesture.",
+      "Her earth nature craves comfort and stability; small, reliable things mean the most to her.",
+      "Earth signs are grounded and practical — steadiness is what makes her feel safe."
+    ],
+    Air: [
+      "As an air sign, she lives in ideas and conversation — a real talk can shift her whole mood.",
+      "Her air nature needs mental stimulation and connection; she wants to be heard, not handled.",
+      "Air signs think out loud — let her talk it through and she'll find her footing."
+    ],
+    Water: [
+      "As a water sign, she feels first and thinks second — meet the emotion before the logic.",
+      "Her water nature runs deep; she needs her feelings acknowledged, not solved.",
+      "Water signs are intuitive and tender — lead with empathy and she'll soften."
+    ]
+  };
+
+  function pickFrom(rng, arr) {
+    if (!arr || !arr.length) return "";
+    return arr[Math.floor(rng() * arr.length)];
   }
 
-  /* Full insight: phase + moon + sun + moon-sign + element balance. */
-  function buildInsight(phase, moon, sunSign, moonSignObj) {
-    var p = PHASE_MOOD[phase.key];
+  // Where she sits within the current phase: early / mid / late (or peak).
+  function cycleStage(pred) {
+    var ph = pred.phase.key;
+    if (ph === "ovulation") return "peak";
+    var d = pred.dayOfCycle, P = pred.periodLength, L = pred.cycleLength;
+    var ovuDay = L - 13; // day number of ovulation
+    var prog;
+    if (ph === "menstrual") prog = (d - 1) / Math.max(1, P - 1);
+    else if (ph === "follicular") prog = (d - P) / Math.max(1, (ovuDay - 2) - P);
+    else prog = (d - (ovuDay + 2)) / Math.max(1, L - (ovuDay + 2));
+    if (isNaN(prog)) return "mid";
+    if (prog < 0.34) return "early";
+    if (prog > 0.66) return "late";
+    return "mid";
+  }
+
+  // Dynamic, number-driven sentence — changes every day on its own.
+  function buildWhere(pred) {
+    var day = pred.dayOfCycle;
+    var today = Cycle.addDays(pred.cycleStart, day - 1);
+    var toOvu = Cycle.daysBetween(today, pred.ovulation);
+    var toFertile = Cycle.daysBetween(today, pred.fertileStart);
+    var base = "She's on <strong>day " + day + "</strong> of her cycle";
+    var clause;
+    if (pred.isOvulationDay) clause = ", right at ovulation — her peak.";
+    else if (pred.isFertile) clause = ", inside her fertile window (through " + fmtShort(pred.fertileEnd) + ").";
+    else if (toFertile >= 1 && toFertile <= 5) clause = ", with her fertile window opening in " + toFertile + (toFertile === 1 ? " day" : " days") + ".";
+    else if (toOvu >= 1) clause = ", about " + toOvu + (toOvu === 1 ? " day" : " days") + " out from ovulation.";
+    else clause = ", with her next period expected in " + pred.daysUntilNext + (pred.daysUntilNext === 1 ? " day" : " days") + " (around " + fmtShort(pred.nextPeriod) + ").";
+    return base + clause;
+  }
+
+  /* Interpret the blend of her sun element and today's moon element. */
+  var BALANCE_SAME = [
+    "Her core nature and today's mood are both <strong>{el}</strong> — that energy is doubled, so expect a strong, undiluted dose of it.",
+    "With both her sign and the Moon in <strong>{el}</strong>, there's no counterweight today — whatever {el} brings, it brings fully.",
+    "Two helpings of <strong>{el}</strong> today: her temperament and her mood point the same direction, amplified."
+  ];
+  var BALANCE_PAIRS = {
+    "Air-Fire": [
+      "Fire and Air feed each other — she's expressive, lively, and ready to engage. Match her spark.",
+      "Air fans her fire today: quick, talkative, and energized. Keep up rather than slow her down."
+    ],
+    "Earth-Water": [
+      "Earth and Water nourish each other — a grounded, nurturing mood. Cozy, caring gestures land well.",
+      "Water softens her earth today: settled, tender, and comfort-seeking. Lean into warmth."
+    ],
+    "Fire-Water": [
+      "Fire meets Water — passion and deep feeling can boil into steam. Emotions may run hot; stay calm and don't take heat personally.",
+      "Her fiery drive and watery feelings are at odds today; expect intensity, and be the steady one."
+    ],
+    "Earth-Fire": [
+      "Fire meets Earth — drive versus caution. She may feel torn between acting and staying safe; don't rush her.",
+      "Her grounded side and a restless spark are pulling against each other; give her both patience and a little motion."
+    ],
+    "Air-Earth": [
+      "Air meets Earth — restlessness versus routine. Give her a little novelty and a little stability both.",
+      "Her practical side and a busy mind are competing today; structure plus a small change of scene helps."
+    ],
+    "Air-Water": [
+      "Air meets Water — thoughts versus feelings. She may want to talk and feel at once; listen first, solve later.",
+      "Her heady side and her tender side are both loud today; make room for both without forcing logic."
+    ]
+  };
+
+  function buildBalance(rng, sunEl, moonEl) {
+    if (sunEl === moonEl) {
+      return pickFrom(rng, BALANCE_SAME).replace(/\{el\}/g, sunEl);
+    }
+    var pair = [sunEl, moonEl].sort().join("-");
+    return BALANCE_PAIRS[pair]
+      ? pickFrom(rng, BALANCE_PAIRS[pair])
+      : "Her sun and the Moon mix two different energies today — expect a blend of both.";
+  }
+
+  // Throughline: cycle energy direction vs. moon direction.
+  var SYNTH = {
+    upUp: [
+      "Both her cycle and the waxing Moon are building — a naturally upbeat, outgoing stretch. A great time to make plans and lean into connection.",
+      "Her rising cycle energy and the growing Moon point the same way: outward and up. Capitalize on it.",
+      "Two tailwinds at once — her body and the Moon are both building. Momentum is on your side today.",
+      "Cycle and sky agree: this is an expansive, yes-saying day. Use it."
+    ],
+    downDown: [
+      "Her cycle and the waning Moon both invite slowing down — expect a quieter, more inward mood. Comfort and patience go a long way.",
+      "Both signals point inward right now. Lower the tempo and let the day be gentle.",
+      "Her body and the Moon are both winding down — a day for rest, not push.",
+      "Cycle and sky agree on retreat today. Don't fight the current."
+    ],
+    upDown: [
+      "Her body is energized while the Moon winds down — a mixed signal. She may want to do things but tire quickly, so keep plans flexible.",
+      "Her cycle says go, the Moon says slow — let her start things but leave room to bail early.",
+      "Rising energy against a fading Moon: enthusiasm now, fatigue later. Pace it.",
+      "Her drive is up but the day's undertow pulls back — keep ambitions light and flexible."
+    ],
+    downUp: [
+      "Her cycle leans inward while the Moon builds outside — a tender contrast. Don't over-schedule her, and let her set the pace.",
+      "Inner quiet, outer buzz: the Moon's pull and her cycle disagree today. Follow her lead.",
+      "A gentle tension — the world's energy is up but hers is turning in. Keep it low-key.",
+      "The sky says go out, her body says stay in. Let her choose, and protect her quiet."
+    ]
+  };
+
+  function synthKey(phaseKey, moon) {
+    var energyUp = (phaseKey === "follicular" || phaseKey === "ovulation");
+    return energyUp ? (moon.waxing ? "upUp" : "upDown") : (moon.waxing ? "downUp" : "downDown");
+  }
+
+  // Shared moon paragraph used by both readings.
+  function moonParagraph(rng, moon, moonSignObj) {
+    return "<p><strong>The Moon &amp; her mood.</strong> At " +
+      Math.round(moon.illumination * 100) + "% lit, " +
+      pickFrom(rng, MOON_PHASE_LINES[moon.name] || ["the Moon sets a shifting tone"]) +
+      ". With the Moon in <strong>" + moonSignObj.name + "</strong> (" + moonSignObj.element +
+      "), her emotional weather leans <strong>" +
+      pickFrom(rng, MOON_ELEMENT[moonSignObj.element] || ["shifting"]) + "</strong>.</p>";
+  }
+
+  /* Full daily reading: assembled from pools, seeded by the calendar day. */
+  function buildInsight(pred, moon, sunSign, moonSignObj) {
+    var phaseKey = pred.phase.key;
+    var rng = makeRng(dailySeed(new Date()) + 101);
+    var stage = cycleStage(pred);
     var parts = [];
 
-    var lead = data.name ? p.body.replace(/^Her\b/, escapeHtml(data.name) + "'s") : p.body;
-    parts.push('<p class="lead"><strong>' + p.title + ".</strong> " + lead + "</p>");
+    parts.push('<p class="lead">' + pickFrom(rng, GLANCE[phaseKey]) + "</p>");
+    parts.push("<p><strong>Where she is.</strong> " + buildWhere(pred) + "</p>");
 
-    parts.push("<p><strong>The Moon &amp; her feelings.</strong> Today's <strong>" +
-      moon.name + "</strong> (" + Math.round(moon.illumination * 100) +
-      "% lit) carries " + (MOON_MOOD[moon.name] || "a shifting mood") +
-      ". With the Moon in <strong>" + moonSignObj.name + "</strong> (" +
-      moonSignObj.element + "), her emotional weather today leans <strong>" +
-      (MOON_ELEMENT[moonSignObj.element] || "shifting") + "</strong>.</p>");
+    var body = pickFrom(rng, PHASE_BODY[phaseKey]);
+    if (data.name) body = body.replace(/^Her\b/, escapeHtml(data.name) + "'s");
+    var stageNote = pickFrom(rng, (STAGE_NOTE[phaseKey] || {})[stage] || []);
+    parts.push("<p><strong>" + PHASE_TITLE[phaseKey] + ".</strong> " + body +
+      (stageNote ? " " + stageNote : "") + "</p>");
+
+    parts.push(moonParagraph(rng, moon, moonSignObj));
 
     if (sunSign) {
-      parts.push("<p><strong>Her sun sign.</strong> As a <strong>" + sunSign.name +
-        "</strong> (" + sunSign.element + "), " + SUN_ELEMENT[sunSign.element] + "</p>");
-      parts.push("<p><strong>Element balance.</strong> " +
-        balanceText(sunSign.element, moonSignObj.element) + "</p>");
+      parts.push("<p><strong>Her sign.</strong> " + pickFrom(rng, SUN_ELEMENT[sunSign.element]) + "</p>");
+      parts.push("<p><strong>The balance.</strong> " + buildBalance(rng, sunSign.element, moonSignObj.element) + "</p>");
     } else {
       parts.push('<p class="muted"><strong>Tip:</strong> Add her birthday in Settings to unlock ' +
         "her sun sign and a personalized element-balance reading.</p>");
     }
 
-    parts.push("<p><strong>The big picture.</strong> " +
-      synthesize(phase.key, moon) + "</p>");
+    parts.push("<p><strong>The throughline.</strong> " + pickFrom(rng, SYNTH[synthKey(phaseKey, moon)]) + "</p>");
+    parts.push('<p class="aphorism">' + pickFrom(rng, APHORISM[phaseKey]) + "</p>");
     return parts.join("");
-  }
-
-  function synthesize(phaseKey, moon) {
-    var energyUp = (phaseKey === "follicular" || phaseKey === "ovulation");
-    var moonUp = moon.waxing;
-    if (energyUp && moonUp) {
-      return "Both her cycle and the waxing Moon are building — a naturally upbeat, outgoing stretch. A great time to make plans together and lean into connection.";
-    }
-    if (!energyUp && !moonUp) {
-      return "Her cycle and the waning Moon both invite slowing down — expect a quieter, more inward mood. Comfort and patience will go a long way.";
-    }
-    if (energyUp && !moonUp) {
-      return "Her body is energized while the Moon winds down — a mixed signal. She may want to do things but tire quickly, so keep plans flexible.";
-    }
-    return "Her cycle leans inward while the Moon builds outside — a tender contrast. Don't over-schedule her, and let her set the pace.";
   }
 
   /* ---------- Practical partner tips ---------- */
@@ -626,7 +1008,7 @@
     var insightPhase = pred.hasData ? pred.phase : { key: "follicular", label: "Follicular" };
     html += '<div class="card insight"><h2>🔮 Cosmic mood</h2>';
     if (pred.hasData) {
-      html += buildInsight(pred.phase, moon, sunSign, moonSignObj);
+      html += buildInsight(pred, moon, sunSign, moonSignObj);
     } else {
       // No cycle data yet: still give the full moon/sun/element reading.
       html += buildCosmicOnly(moon, sunSign, moonSignObj);
@@ -659,24 +1041,20 @@
     wireBackupNudge();
   }
 
-  /* Cosmic reading when no cycle data is logged yet. */
+  /* Cosmic reading when no cycle data is logged yet (moon + sign only). */
   function buildCosmicOnly(moon, sunSign, moonSignObj) {
+    var rng = makeRng(dailySeed(new Date()) + 202);
     var parts = [];
-    parts.push('<p class="lead"><strong>Today\'s sky.</strong> The <strong>' + moon.name +
-      "</strong> (" + Math.round(moon.illumination * 100) + "% lit) carries " +
-      (MOON_MOOD[moon.name] || "a shifting mood") + ".</p>");
-    parts.push("<p><strong>The Moon &amp; her feelings.</strong> With the Moon in <strong>" +
-      moonSignObj.name + "</strong> (" + moonSignObj.element + "), her emotional weather today leans <strong>" +
-      (MOON_ELEMENT[moonSignObj.element] || "shifting") + "</strong>.</p>");
+    parts.push('<p class="lead">' + pickFrom(rng, GLANCE_GENERIC) + "</p>");
+    parts.push(moonParagraph(rng, moon, moonSignObj));
     if (sunSign) {
-      parts.push("<p><strong>Her sun sign.</strong> As a <strong>" + sunSign.name + "</strong> (" +
-        sunSign.element + "), " + SUN_ELEMENT[sunSign.element] + "</p>");
-      parts.push("<p><strong>Element balance.</strong> " +
-        balanceText(sunSign.element, moonSignObj.element) + "</p>");
+      parts.push("<p><strong>Her sign.</strong> " + pickFrom(rng, SUN_ELEMENT[sunSign.element]) + "</p>");
+      parts.push("<p><strong>The balance.</strong> " + buildBalance(rng, sunSign.element, moonSignObj.element) + "</p>");
     } else {
       parts.push('<p class="muted"><strong>Tip:</strong> Add her birthday in Settings for her sun sign ' +
         "and a personalized element-balance reading. Log a period in History to add cycle-phase insights too.</p>");
     }
+    parts.push('<p class="aphorism">' + pickFrom(rng, APHORISM_GENERIC) + "</p>");
     return parts.join("");
   }
 

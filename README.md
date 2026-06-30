@@ -40,8 +40,11 @@ All colors and fonts are defined as CSS custom properties at the top of
 - Current **cycle day** and **phase** (menstrual / follicular / ovulation / luteal)
 - Today's **moon phase** with illumination %, and the **moon's zodiac sign**
 - Her **sun sign** (from her birthday) shown alongside the moon sign
-- A detailed **cosmic mood** reading that weaves together cycle phase, moon
-  phase, moon sign, sun sign, and the **element balance** between them
+- A detailed, **non-repeating cosmic mood** reading (Co-Star style): each day is
+  assembled from large phrasing pools with a date-seeded RNG and woven together
+  with cycle phase + sub-stage, moon phase, moon sign, sun sign, the **element
+  balance** between them, dynamic cycle-day detail, and a closing aphorism —
+  stable through the day, fresh tomorrow
 - A **Tips & Ideas** card with simple, practical do's and don'ts for the day
   (e.g. *"today may not be the day to bring up money"*, *"bring home takeout"*)
 - An **Intimacy outlook** card: likely desire and adventurousness meters, an
