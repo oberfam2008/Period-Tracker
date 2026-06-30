@@ -29,64 +29,110 @@
     luteal: "Winding Down"
   };
 
-  // Short, evocative opening line (the "day at a glance").
+  // Short, evocative opening line (the "day at a glance"), split so that
+  // stage-specific lines only surface in the matching sub-stage. The `any`
+  // bucket applies to the whole phase and is merged in at pick time.
   var GLANCE = {
-    menstrual: [
-      "She's running on a lower, quieter frequency today.",
-      "Her body is asking for less, not more.",
-      "This is a week for retreat, and she feels it.",
-      "Energy is scarce; tenderness is the currency that counts.",
-      "She's turned inward, conserving what she has.",
-      "The volume of her world wants turning down today.",
-      "Comfort outranks everything else right now.",
-      "She's in the rest phase — meet her there, gently.",
-      "Small and soft beats big and bright today.",
-      "Her reserves are low; don't ask her to spend them.",
-      "The pull today is toward stillness and warmth.",
-      "She's recovering — patience reads as love this week."
-    ],
-    follicular: [
-      "Something in her is waking back up.",
-      "Her energy is on the rise, and so is her openness.",
-      "The door is open today — to ideas, to plans, to you.",
-      "She's building momentum; lean into it with her.",
-      "Fresh starts feel possible to her right now.",
-      "Curiosity is back online for her today.",
-      "She's reaching outward again after the quiet.",
-      "There's a lift in her step that wasn't there last week.",
-      "Optimism comes easily to her in this stretch.",
-      "She's game — a good day to ask, suggest, invite.",
-      "Her appetite for the new is climbing.",
-      "The brightening has begun; ride it with her."
-    ],
-    ovulation: [
-      "She's at the top of her arc today.",
-      "This is her most magnetic, open window of the month.",
-      "Confidence and warmth are pouring off her.",
-      "She's lit up — connection is effortless right now.",
-      "Today she's at her most present and alive.",
-      "Her social, expressive self is fully switched on.",
-      "The peak is here; she feels it and so will you.",
-      "She's radiating; don't waste the day on logistics.",
-      "Closeness comes easily — she's reaching for it too.",
-      "This is the brightest the cycle gets — show up for it.",
-      "Her energy is generous today; match it.",
-      "Everything in her is turned outward and warm."
-    ],
-    luteal: [
-      "The tide is going out; she's turning inward again.",
-      "Her patience is thinner than it was a week ago.",
-      "She's winding down, and the small stuff lands harder.",
-      "Sensitivity is up; tread a little softer today.",
-      "The bright stretch is behind her — comfort is back on the menu.",
-      "She's conserving again; don't add to the load.",
-      "Feelings sit closer to the surface for her now.",
-      "This is the part of the cycle that needs your steadiness.",
-      "She's more easily worn down today — buffer her from friction.",
-      "The mood can turn quickly now; be the calm constant.",
-      "Her bandwidth is shrinking; protect it.",
-      "Reassurance goes further than anything else this week."
-    ]
+    menstrual: {
+      any: [
+        "She's running on a lower, quieter frequency today.",
+        "Her body is asking for less, not more.",
+        "Energy is scarce; tenderness is the currency that counts.",
+        "She's turned inward, conserving what she has.",
+        "The volume of her world wants turning down today.",
+        "Comfort outranks everything else right now.",
+        "She's in the rest phase — meet her there, gently.",
+        "Small and soft beats big and bright today.",
+        "The pull today is toward stillness and warmth.",
+        "She's recovering — patience reads as love this week."
+      ],
+      early: [
+        "These first days are the heaviest of the cycle — go easy.",
+        "Her reserves are at their lowest right now; don't ask her to spend them.",
+        "This is the deepest part of the dip — minimize everything you can."
+      ],
+      mid: [
+        "She's a few days in — steadier than the start, but still low.",
+        "The worst may be easing, but comfort still rules the day."
+      ],
+      late: [
+        "Her period's winding down — you may see her start to brighten.",
+        "The upswing is just ahead; she's almost back online.",
+        "Energy is about to start climbing again — ease her into it."
+      ]
+    },
+    follicular: {
+      any: [
+        "Something in her is waking back up.",
+        "Her energy is on the rise, and so is her openness.",
+        "The door is open today — to ideas, to plans, to you.",
+        "She's building momentum; lean into it with her.",
+        "Fresh starts feel possible to her right now.",
+        "Curiosity is back online for her today.",
+        "Optimism comes easily to her in this stretch.",
+        "She's game — a good day to ask, suggest, invite.",
+        "Her appetite for the new is climbing."
+      ],
+      early: [
+        "She's just re-emerging from the quiet — warming back up.",
+        "The brightening has only just begun; let her ease into it.",
+        "Still finding her feet after her period — gentle momentum."
+      ],
+      mid: [
+        "She's hitting an easy, capable stride today.",
+        "Right in the sweet spot — motivated and up for things."
+      ],
+      late: [
+        "She's closing in on her peak — energy and confidence cresting.",
+        "Almost at the top of her arc; momentum is strong.",
+        "The run-up to ovulation — she's nearly at full brightness."
+      ]
+    },
+    ovulation: {
+      any: [
+        "She's at the top of her arc today.",
+        "This is her most magnetic, open window of the month.",
+        "Confidence and warmth are pouring off her.",
+        "She's lit up — connection is effortless right now.",
+        "Today she's at her most present and alive.",
+        "Her social, expressive self is fully switched on.",
+        "She's radiating; don't waste the day on logistics.",
+        "Closeness comes easily — she's reaching for it too.",
+        "This is the brightest the cycle gets — show up for it.",
+        "Her energy is generous today; match it.",
+        "Everything in her is turned outward and warm."
+      ],
+      peak: [
+        "The peak is here; she feels it and so will you.",
+        "This is the day it all crests — make it count."
+      ]
+    },
+    luteal: {
+      any: [
+        "She's winding down, and the small stuff lands harder.",
+        "This is the part of the cycle that needs your steadiness.",
+        "The mood can turn quickly now; be the calm constant.",
+        "Reassurance goes further than anything else this week.",
+        "Feelings sit closer to the surface for her now.",
+        "She's conserving again; don't add to the load.",
+        "The bright stretch is behind her — comfort is back on the menu.",
+        "Her bandwidth is shrinking; protect it."
+      ],
+      early: [
+        "Past her peak but still steady — an easy stretch before the dip.",
+        "She likely still feels pretty good; the wind-down is gentle so far.",
+        "Early in the descent — energy's dipping slowly, not sharply."
+      ],
+      mid: [
+        "The wind-down is underway; patience is getting shorter.",
+        "Energy's dipping now — start easing the load."
+      ],
+      late: [
+        "Tenderness is peaking — the days right before her period are the rawest.",
+        "She's most easily worn down right now; buffer her from friction.",
+        "This is the PMS window — soften everything you can."
+      ]
+    }
   };
 
   // Longer descriptive body for the phase.
@@ -195,64 +241,95 @@
     }
   };
 
-  // Co-Star-style punchy closer, addressed to the partner.
+  // Co-Star-style punchy closer, addressed to the partner. Stage-aware so the
+  // advice matches where she is in the phase (see GLANCE for the structure).
   var APHORISM = {
-    menstrual: [
-      "Today, doing less for her is doing more.",
-      "Care doesn't have to be loud to be felt.",
-      "Be the soft place, not another thing to manage.",
-      "What she needs today is subtraction, not addition.",
-      "Comfort is a language; speak it fluently.",
-      "Show up quietly and stay.",
-      "The right move is the gentle one.",
-      "Make her world smaller and warmer today.",
-      "Rest is productive. Let her have it.",
-      "Hold the space; don't try to fix it.",
-      "Your patience is the gift today.",
-      "Lower the stakes on everything you can."
-    ],
-    follicular: [
-      "Say yes to the thing she's curious about.",
-      "Momentum likes company — go with her.",
-      "This is a day to build, not to wait.",
-      "Match her energy and watch it grow.",
-      "Open doors while they're open.",
-      "Plant something today; it'll take root now.",
-      "Be a little spontaneous; she's ready for it.",
-      "Curiosity is contagious — catch it.",
-      "Don't overthink it. Just suggest the thing.",
-      "Her yes is easier to earn this week — ask.",
-      "Lean into the upswing with her.",
-      "Fresh beats familiar today."
-    ],
-    ovulation: [
-      "Don't spend her best day on small things.",
-      "Be present; that's the whole assignment.",
-      "Reach for her — she's reaching too.",
-      "Make a memory, not a to-do list.",
-      "Warmth answered with warmth compounds.",
-      "This is the day to choose her out loud.",
-      "Put the phone down and look at her.",
-      "Say the thing you appreciate — today it lands.",
-      "Connection is the easiest it'll be all month.",
-      "Show up like it's a date, because it is.",
-      "Generosity meets generosity today.",
-      "Don't let the peak pass unmarked."
-    ],
-    luteal: [
-      "Be the calm she can borrow.",
-      "Don't take the weather personally.",
-      "Steadiness is the kindest thing you can offer now.",
-      "Lighten the load before she has to ask.",
-      "Choose patience over being right.",
-      "Soften your edges; hers are already raw.",
-      "Protect her peace today.",
-      "Reassurance costs little and means a lot now.",
-      "Anticipate, don't react.",
-      "Make the day quieter than it wants to be.",
-      "Hold steady while she rides it out.",
-      "Comfort first; everything else can wait."
-    ]
+    menstrual: {
+      any: [
+        "Today, doing less for her is doing more.",
+        "Care doesn't have to be loud to be felt.",
+        "Be the soft place, not another thing to manage.",
+        "Comfort is a language; speak it fluently.",
+        "Show up quietly and stay.",
+        "The right move is the gentle one.",
+        "Make her world smaller and warmer today.",
+        "Rest is productive. Let her have it.",
+        "Hold the space; don't try to fix it.",
+        "Your patience is the gift today.",
+        "Lower the stakes on everything you can."
+      ],
+      early: [
+        "What she needs today is subtraction, not addition.",
+        "Take everything off her plate that you can reach."
+      ],
+      late: [
+        "Let her come back online at her own speed.",
+        "Ease her toward the upswing; don't rush it."
+      ]
+    },
+    follicular: {
+      any: [
+        "Say yes to the thing she's curious about.",
+        "Momentum likes company — go with her.",
+        "This is a day to build, not to wait.",
+        "Match her energy and watch it grow.",
+        "Open doors while they're open.",
+        "Be a little spontaneous; she's ready for it.",
+        "Curiosity is contagious — catch it.",
+        "Don't overthink it. Just suggest the thing.",
+        "Lean into the upswing with her.",
+        "Fresh beats familiar today."
+      ],
+      early: [
+        "Plant something today; it'll take root now.",
+        "Gently float a plan and see what she grabs."
+      ],
+      late: [
+        "Her yes is easiest to earn right now — ask.",
+        "She's nearly at her peak; aim a little higher."
+      ]
+    },
+    ovulation: {
+      any: [
+        "Don't spend her best day on small things.",
+        "Be present; that's the whole assignment.",
+        "Reach for her — she's reaching too.",
+        "Make a memory, not a to-do list.",
+        "Warmth answered with warmth compounds.",
+        "This is the day to choose her out loud.",
+        "Put the phone down and look at her.",
+        "Say the thing you appreciate — today it lands.",
+        "Connection is the easiest it'll be all month.",
+        "Show up like it's a date, because it is.",
+        "Generosity meets generosity today.",
+        "Don't let the peak pass unmarked."
+      ],
+      peak: [
+        "This is the summit — plant the flag together."
+      ]
+    },
+    luteal: {
+      any: [
+        "Be the calm she can borrow.",
+        "Don't take the weather personally.",
+        "Steadiness is the kindest thing you can offer now.",
+        "Lighten the load before she has to ask.",
+        "Choose patience over being right.",
+        "Soften your edges; hers are already raw.",
+        "Protect her peace today.",
+        "Reassurance costs little and means a lot now.",
+        "Anticipate, don't react.",
+        "Make the day quieter than it wants to be.",
+        "Comfort first; everything else can wait."
+      ],
+      early: [
+        "Enjoy the easy stretch — and start lightening the load."
+      ],
+      late: [
+        "Hold steady while she rides it out.",
+        "This is the week your patience matters most."
+      ]
+    }
   };
 
   var GLANCE_GENERIC = [
@@ -356,6 +433,13 @@
   function pickFrom(rng, arr) {
     if (!arr || !arr.length) return "";
     return arr[Math.floor(rng() * arr.length)];
+  }
+
+  // Merge a phase's stage-agnostic `any` lines with its current-stage lines so
+  // only stage-appropriate phrasings can surface, while keeping good variety.
+  function stagePool(map, phaseKey, stage) {
+    var m = map[phaseKey] || {};
+    return (m.any || []).concat(m[stage] || []);
   }
 
   // Where she sits within the current phase: early / mid / late (or peak).
@@ -483,7 +567,7 @@
     var stage = cycleStage(pred);
     var parts = [];
 
-    parts.push('<p class="lead">' + pickFrom(rng, GLANCE[phaseKey]) + "</p>");
+    parts.push('<p class="lead">' + pickFrom(rng, stagePool(GLANCE, phaseKey, stage)) + "</p>");
     parts.push("<p><strong>Where she is.</strong> " + buildWhere(pred) + "</p>");
 
     var body = pickFrom(rng, PHASE_BODY[phaseKey]);
@@ -503,7 +587,7 @@
     }
 
     parts.push("<p><strong>The throughline.</strong> " + pickFrom(rng, SYNTH[synthKey(phaseKey, moon)]) + "</p>");
-    parts.push('<p class="aphorism">' + pickFrom(rng, APHORISM[phaseKey]) + "</p>");
+    parts.push('<p class="aphorism">' + pickFrom(rng, stagePool(APHORISM, phaseKey, stage)) + "</p>");
     return parts.join("");
   }
 
