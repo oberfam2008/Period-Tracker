@@ -466,7 +466,8 @@
     var toFertile = Cycle.daysBetween(today, pred.fertileStart);
     var base = "She's on <strong>day " + day + "</strong> of her cycle";
     var clause;
-    if (pred.isOvulationDay) clause = ", right at ovulation — her peak.";
+    if (pred.isLate) clause = ", and her period is <strong>" + pred.daysLate + (pred.daysLate === 1 ? " day" : " days") + " late</strong> (expected around " + fmtShort(pred.nextPeriod) + ").";
+    else if (pred.isOvulationDay) clause = ", right at ovulation — her peak.";
     else if (pred.isFertile) clause = ", inside her fertile window (through " + fmtShort(pred.fertileEnd) + ").";
     else if (toFertile >= 1 && toFertile <= 5) clause = ", with her fertile window opening in " + toFertile + (toFertile === 1 ? " day" : " days") + ".";
     else if (toOvu >= 1) clause = ", about " + toOvu + (toOvu === 1 ? " day" : " days") + " out from ovulation.";
@@ -1055,17 +1056,30 @@
     var title = data.name ? escapeHtml(data.name) + "'s day 🌙" : "Today 🌙";
 
     if (pred.hasData) {
-      html += '<div class="card hero">' +
+      var nextLine = pred.isLate
+        ? "Period " + pred.daysLate + " day" + (pred.daysLate === 1 ? "" : "s") + " late"
+        : (pred.daysUntilNext === 0 ? "Period expected today"
+            : "Next period in " + pred.daysUntilNext + " day" + (pred.daysUntilNext === 1 ? "" : "s"));
+      var marker = pred.isOvulationDay ? " • Ovulation today 🌟"
+            : pred.isFertile ? " • Fertile window 💧" : "";
+      // Feedback-loop prompt: near/over the expected date, ask him to confirm.
+      var confirmPrompt = (pred.isLate || pred.daysUntilNext <= 1)
+        ? '<div class="confirm-row">' +
+            "<span>" + (pred.isLate ? "Has her period started?" : "Period due soon — started yet?") + "</span>" +
+            '<button id="confirm-period" class="btn">Yes — log it today</button>' +
+          "</div>"
+        : "";
+      var staleNote = pred.stale
+        ? '<div class="muted" style="margin-top:6px">This looks out of date — log her most recent period to refresh predictions.</div>'
+        : "";
+      html += '<div class="card hero' + (pred.isLate ? " hero-late" : "") + '">' +
         '<div class="muted">' + title + " — " + fmt(today) + "</div>" +
         '<div class="muted">Cycle day</div>' +
         '<div class="cycle-day">' + pred.dayOfCycle + "</div>" +
         '<span class="phase-badge phase-' + pred.phase.key + '">' + pred.phase.label + " phase</span>" +
-        '<div class="muted" style="margin-top:10px">' +
-          (pred.daysUntilNext === 0 ? "Period expected today"
-            : "Next period in " + pred.daysUntilNext + " day" + (pred.daysUntilNext === 1 ? "" : "s")) +
-          (pred.isOvulationDay ? " • Ovulation today 🌟"
-            : pred.isFertile ? " • Fertile window 💧" : "") +
-        "</div>" +
+        '<div class="muted" style="margin-top:10px">' + nextLine + marker + "</div>" +
+        staleNote +
+        confirmPrompt +
       "</div>";
     } else {
       html += '<div class="card hero">' +
@@ -1123,6 +1137,14 @@
 
     container.innerHTML = html;
     wireBackupNudge();
+    var confirmBtn = document.getElementById("confirm-period");
+    if (confirmBtn) confirmBtn.addEventListener("click", function () {
+      var iso = toIso(new Date());
+      if (data.periods.indexOf(iso) === -1) data.periods.push(iso);
+      Store.save(data);
+      renderDaily();
+      renderHistory();
+    });
   }
 
   /* Cosmic reading when no cycle data is logged yet (moon + sign only). */
@@ -1167,18 +1189,23 @@
     }
     var cycleNote = pred.cycleSource === "history" ? "from her logs" : "default";
     var periodNote = pred.periodSource === "history" ? "from her logs" : "default";
+    var nextBadge = pred.isLate ? pred.daysLate + "d late" : pred.daysUntilNext + "d";
+    var range = (pred.cycleSource === "history" && pred.spread > 0) ? "±" + pred.spread + "d" : "";
+    var regNote = (pred.regularity && pred.regularity !== "unknown" && pred.regularity !== "building")
+      ? " Her cycles are <strong>" + pred.regularity + "</strong>" + (pred.spread ? " (±" + pred.spread + " days)" : "") + "."
+      : (pred.cycleSource === "history" ? " Log a few cycles to gauge how regular she is." : "");
 
     container.innerHTML =
       '<div class="card">' +
         "<h2>Predictions</h2>" +
         '<div class="pred-grid">' +
-          predTile("dot-period", "Next period", fmtShort(pred.nextPeriod), pred.daysUntilNext + "d") +
-          predTile("dot-ovulation", "Ovulation", fmtShort(pred.ovulation), "") +
+          predTile("dot-period", "Next period", fmtShort(pred.nextPeriod), nextBadge) +
+          predTile("dot-ovulation", "Ovulation", fmtShort(pred.ovulation), range ? range : "") +
           predTile("dot-fertile", "Fertile window", fmtShort(pred.fertileStart) + "–" + fmtShort(pred.fertileEnd), "") +
         "</div>" +
         '<p class="muted" style="margin-top:14px">Average cycle: <strong>' + pred.cycleLength +
           " days</strong> (" + cycleNote + ") · Average period: <strong>" + pred.periodLength +
-          " days</strong> (" + periodNote + ").</p>" +
+          " days</strong> (" + periodNote + ")." + regNote + "</p>" +
         (pred.periodSource === "default"
           ? '<p class="muted">Add last days to logged periods below to personalize period length.</p>'
           : "") +

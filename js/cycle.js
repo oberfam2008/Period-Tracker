@@ -38,18 +38,36 @@
       .sort(function (a, b) { return a - b; });
   }
 
-  /* Average cycle length from gaps between logged starts; falls back to default. */
+  /* Average cycle length from gaps between logged starts; falls back to default.
+   * Also reports variability (rounded std-dev) and a regularity label so the UI
+   * can show confidence and a ± range. */
   function averageCycle(periods, fallback) {
     var starts = sortedStarts(periods);
-    if (starts.length < 2) return { length: fallback, source: "default" };
+    if (starts.length < 2) return { length: fallback, source: "default", spread: 0, samples: 0, regularity: "unknown" };
     var gaps = [];
     for (var i = 1; i < starts.length; i++) {
       var g = daysBetween(starts[i - 1], starts[i]);
       if (g >= 15 && g <= 60) gaps.push(g); // ignore implausible entries
     }
-    if (!gaps.length) return { length: fallback, source: "default" };
+    if (!gaps.length) return { length: fallback, source: "default", spread: 0, samples: 0, regularity: "unknown" };
     var avg = gaps.reduce(function (s, g) { return s + g; }, 0) / gaps.length;
-    return { length: Math.round(avg), source: "history" };
+    var variance = gaps.reduce(function (s, g) { return s + (g - avg) * (g - avg); }, 0) / gaps.length;
+    var spread = Math.round(Math.sqrt(variance));
+    return {
+      length: Math.round(avg),
+      source: "history",
+      spread: spread,
+      samples: gaps.length,
+      regularity: regularityLabel(spread, gaps.length)
+    };
+  }
+
+  function regularityLabel(spread, samples) {
+    if (samples < 2) return "building"; // need a few cycles before it means much
+    if (spread <= 1) return "very regular";
+    if (spread <= 3) return "regular";
+    if (spread <= 5) return "somewhat irregular";
+    return "irregular";
   }
 
   /* Average period (bleeding) length from logged end dates; falls back to default.
@@ -82,17 +100,18 @@
         cycleSource: cycleInfo.source, periodSource: periodInfo.source };
     }
 
+    // The current cycle is anchored to the most recent LOGGED start. We don't
+    // silently roll into an assumed new cycle — if the next period is overdue
+    // and unlogged, we report it as "late" (the feedback-loop moment).
     var lastStart = starts[starts.length - 1];
-
-    // Roll forward to the cycle that contains/precedes today.
-    var nextPeriod = new Date(lastStart);
-    while (daysBetween(nextPeriod, today) >= cycleLen) {
-      nextPeriod = addDays(nextPeriod, cycleLen);
-    }
-    var cycleStart = nextPeriod;
-    nextPeriod = addDays(cycleStart, cycleLen);
-
+    var cycleStart = lastStart;
+    var nextPeriod = addDays(lastStart, cycleLen);
     var dayOfCycle = daysBetween(cycleStart, today) + 1; // day 1 = first day
+
+    var daysUntilNext = daysBetween(today, nextPeriod);
+    var isLate = daysUntilNext < 0;
+    var daysLate = isLate ? -daysUntilNext : 0;
+    var stale = daysLate > cycleLen; // overdue by a whole cycle -> likely just unlogged
 
     // Ovulation ~14 days before the next period; fertile window = 5 days before + ovulation day.
     var ovulation = addDays(nextPeriod, -14);
@@ -110,7 +129,12 @@
       cycleStart: cycleStart,
       dayOfCycle: dayOfCycle,
       nextPeriod: nextPeriod,
-      daysUntilNext: daysBetween(today, nextPeriod),
+      daysUntilNext: daysUntilNext,
+      isLate: isLate,
+      daysLate: daysLate,
+      stale: stale,
+      spread: cycleInfo.spread,
+      regularity: cycleInfo.regularity,
       ovulation: ovulation,
       fertileStart: fertileStart,
       fertileEnd: fertileEnd,

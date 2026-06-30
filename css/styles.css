@@ -212,6 +212,17 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   text-align: center;
   background: var(--surface);
 }
+.hero-late { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
+.confirm-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border);
+}
+.confirm-row span { font-size: 0.9rem; color: var(--text); }
 .cycle-day {
   font-family: var(--font-mono);
   font-size: 3rem;
