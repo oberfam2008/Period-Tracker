@@ -1105,6 +1105,34 @@
     if (fired) Store.save(data);
   }
 
+  // The single "good" tip shown today (matches the first one in the Tips card).
+  function topGoodTip(phaseKey) {
+    var pool = (PHASE_TIPS[phaseKey] && PHASE_TIPS[phaseKey].good) || [];
+    if (!pool.length) return "";
+    var rng = makeRng(dailySeed(new Date()) + (TIP_SEED[phaseKey] || 0));
+    return stripLeadEmoji(sampleFrom(rng, pool, 1)[0]);
+  }
+
+  function glanceRow(k, v) {
+    return '<div class="glance-row"><span class="glance-k">' + k +
+      '</span><span class="glance-v">' + escapeHtml(v) + "</span></div>";
+  }
+
+  // At-a-glance digest: one line summarizing each category on the Daily page.
+  function buildGlance(pred, moon, moonSignObj, sunSign) {
+    var rows = [];
+    rows.push(glanceRow("Mood", PHASE_TITLE[pred.phase.key]));
+    rows.push(glanceRow("Sky", moon.name + " · Moon in " + moonSignObj.name +
+      (sunSign ? " · " + sunSign.name + " sun" : "")));
+    if (data.showIntimacy !== false) {
+      rows.push(glanceRow("Intimacy", INTIMACY[intimacyStage(pred)].headline));
+    }
+    var tip = topGoodTip(pred.phase.key);
+    if (tip) rows.push(glanceRow("Today", tip));
+    return '<div class="glance-list"><div class="glance-eyebrow">At a glance</div>' +
+      rows.join("") + "</div>";
+  }
+
   function renderDaily() {
     var container = document.getElementById("daily-content");
     var today = new Date();
@@ -1141,6 +1169,7 @@
         '<span class="phase-badge phase-' + pred.phase.key + '">' + pred.phase.label + " phase</span>" +
         '<div class="muted" style="margin-top:10px">' + nextLine + marker + "</div>" +
         staleNote +
+        buildGlance(pred, moon, moonSignObj, sunSign) +
         confirmPrompt +
       "</div>";
     } else {

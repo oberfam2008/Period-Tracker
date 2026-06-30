@@ -280,6 +280,35 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 }
 .confirm-row span { font-size: 0.9rem; color: var(--text); }
 .hero .muted { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.glance-list {
+  text-align: left;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.glance-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.glance-row {
+  display: flex;
+  gap: 12px;
+  padding: 5px 0;
+  align-items: baseline;
+}
+.glance-k {
+  flex: 0 0 66px;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.glance-v { color: var(--text); font-size: 0.9rem; }
 .cycle-day {
   font-family: var(--font-mono);
   font-size: 4.2rem;
