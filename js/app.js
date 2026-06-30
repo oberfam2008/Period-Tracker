@@ -1444,6 +1444,8 @@
         '<span class="lg"><span class="sw cal-luteal"></span>Luteal</span>' +
         '<span class="lg">⭐ ovulation · 💧 fertile · 🩸 logged period · • note/intimacy</span>'
       : '<span class="muted">Log a period in History to populate the calendar.</span>';
+
+    renderTripWeeks();
   }
 
   function setupCalendarControls() {
@@ -1454,6 +1456,117 @@
     document.getElementById("cal-next").addEventListener("click", function () {
       calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1);
       renderCalendar();
+    });
+  }
+
+  /* ---------- Suggested trip weeks ----------
+   * Scores each Sunday–Saturday week over the next year by how much of it falls
+   * in her high-energy window (follicular → ovulation), and surfaces the best
+   * week per projected cycle. */
+  function startOfWeekSunday(d) {
+    var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    x.setDate(x.getDate() - x.getDay()); // back up to Sunday
+    return x;
+  }
+
+  function tripWeight(info, cyc) {
+    if (!info || !info.phase) return 0;
+    if (info.phase === "menstrual") return 0;
+    if (info.phase === "ovulation") return 5;
+    if (info.phase === "follicular") return info.fertile ? 4 : 3;
+    // luteal: good early, drops off toward PMS
+    var ovuDay = cyc - 13, doc = info.dayOfCycle;
+    if (doc <= ovuDay + 5) return 2;
+    if (doc >= cyc - 2) return 0;
+    return 1;
+  }
+
+  function weekScore(sunday, model) {
+    var total = 0, phases = {};
+    for (var i = 0; i < 7; i++) {
+      var d = Cycle.addDays(sunday, i);
+      var info = calDayInfo(d, model);
+      total += tripWeight(info, model.cyc);
+      if (info.phase) phases[info.phase] = (phases[info.phase] || 0) + 1;
+    }
+    return { total: total, phases: phases };
+  }
+
+  function tripReason(phases) {
+    var bright = (phases.follicular || 0) + (phases.ovulation || 0);
+    if (bright >= 5) return "her high-energy peak — great for an active or social getaway";
+    if (bright >= 3) return "mostly her rising-energy stretch";
+    if ((phases.luteal || 0) >= 4) return "a calmer, cozy window";
+    if ((phases.menstrual || 0) >= 3) return "overlaps her period — lower energy";
+    return "a mixed week";
+  }
+
+  function computeTripWeeks() {
+    var model = calendarModel();
+    if (!model.starts.length) return [];
+    var cyc = model.cyc;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    var thisSunday = startOfWeekSunday(today);
+    var lastStart = model.starts[model.starts.length - 1];
+    var horizon = new Date(today); horizon.setFullYear(horizon.getFullYear() + 1);
+
+    var weeks = [], seen = {}, guard = 0, k = 0;
+    while (guard++ < 400) {
+      var cs = Cycle.addDays(lastStart, k * cyc);
+      k++;
+      if (cs > horizon) break;
+      var center = Cycle.addDays(cs, (cyc - 14) - 1); // day before ovulation
+      if (Cycle.addDays(center, 3) < today) continue; // whole window already past
+      var base = startOfWeekSunday(center);
+      var best = null;
+      [-1, 0, 1].forEach(function (off) {
+        var sun = Cycle.addDays(base, off * 7);
+        if (sun < thisSunday || sun > horizon) return;
+        var sc = weekScore(sun, model);
+        if (!best || sc.total > best.score) best = { sunday: sun, score: sc.total, phases: sc.phases };
+      });
+      if (best && !seen[toIso(best.sunday)]) {
+        seen[toIso(best.sunday)] = true;
+        best.saturday = Cycle.addDays(best.sunday, 6);
+        best.reason = tripReason(best.phases);
+        weeks.push(best);
+      }
+    }
+    weeks.sort(function (a, b) { return a.sunday - b.sunday; });
+    return weeks;
+  }
+
+  function renderTripWeeks() {
+    var el = document.getElementById("trip-weeks");
+    if (!el) return;
+    var weeks = computeTripWeeks();
+    if (!weeks.length) {
+      el.innerHTML = '<div class="card"><h2>Trip windows</h2>' +
+        '<p class="muted">Log a period in History to get suggested trip weeks for the year ahead.</p></div>';
+      return;
+    }
+    var maxScore = weeks.reduce(function (m, w) { return Math.max(m, w.score); }, 0);
+    var topIso = null; // star only the soonest best week, not every tie
+    weeks.forEach(function (w) { if (topIso === null && w.score === maxScore) topIso = toIso(w.sunday); });
+    var rows = weeks.map(function (w) {
+      var isTop = toIso(w.sunday) === topIso;
+      return '<button class="trip-item' + (isTop ? " trip-top" : "") + '" data-month="' +
+          w.sunday.getFullYear() + "-" + w.sunday.getMonth() + '">' +
+        '<div class="trip-dates">' + (isTop ? "⭐ " : "") + fmtShort(w.sunday) + " – " + fmtShort(w.saturday) + "</div>" +
+        '<div class="trip-reason">' + w.reason + "</div>" +
+      "</button>";
+    }).join("");
+    el.innerHTML = '<div class="card"><h2>Trip windows</h2>' +
+      '<p class="muted">Best Sunday–Saturday weeks for a getaway over the next year, ranked by her high-energy window. ⭐ marks the strongest.</p>' +
+      rows +
+      '<p class="muted" style="margin-top:8px">Estimates from her average cycle — weeks further out are less certain.</p></div>';
+
+    el.querySelectorAll(".trip-item").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var mp = b.getAttribute("data-month").split("-");
+        calMonth = new Date(+mp[0], +mp[1], 1);
+        renderCalendar();
+      });
     });
   }
 

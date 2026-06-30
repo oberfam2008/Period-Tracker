@@ -38,14 +38,17 @@
 
       <!-- CALENDAR -->
       <section id="calendar" class="panel" role="tabpanel">
-        <div class="card">
-          <div class="cal-head">
-            <button id="cal-prev" class="cal-nav" aria-label="Previous month">‹</button>
-            <h2 id="cal-title">—</h2>
-            <button id="cal-next" class="cal-nav" aria-label="Next month">›</button>
+        <div class="cal-layout">
+          <div class="card cal-main">
+            <div class="cal-head">
+              <button id="cal-prev" class="cal-nav" aria-label="Previous month">‹</button>
+              <h2 id="cal-title">—</h2>
+              <button id="cal-next" class="cal-nav" aria-label="Next month">›</button>
+            </div>
+            <div id="cal-grid"></div>
+            <div class="cal-legend" id="cal-legend"></div>
           </div>
-          <div id="cal-grid"></div>
-          <div class="cal-legend" id="cal-legend"></div>
+          <div id="trip-weeks" class="cal-side"></div>
         </div>
       </section>
 

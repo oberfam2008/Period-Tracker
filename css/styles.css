@@ -492,6 +492,32 @@ select {
 }
 
 /* Calendar */
+.cal-layout { display: flex; gap: 16px; align-items: flex-start; }
+.cal-layout > .cal-main { flex: 2; margin-bottom: 0; }
+.cal-side { flex: 1; min-width: 0; }
+.cal-side .card { margin-bottom: 0; }
+.trip-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text);
+}
+.trip-item:hover { border-color: var(--accent); }
+.trip-top { border-color: var(--accent); background: rgba(198, 124, 78, 0.10); }
+.trip-dates { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; }
+.trip-reason { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+@media (max-width: 720px) {
+  .cal-layout { flex-direction: column; }
+  .cal-layout > .cal-main, .cal-side { width: 100%; }
+}
+
 .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .cal-head h2 { margin: 0; font-family: var(--font-display); font-weight: 600; }
 .cal-nav {
