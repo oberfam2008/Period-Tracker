@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HerRhythm — Cycle Companion</title>
+  <script>
+    // Apply saved theme before paint to avoid a flash of the wrong theme.
+    try {
+      var d = JSON.parse(localStorage.getItem("luna.data.v1") || "{}");
+      var t = d.theme || "system";
+      var dark = t === "dark" || (t === "system" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=IBM+Plex+Mono&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -141,6 +150,17 @@
             <input type="number" id="set-period" min="1" max="10" />
           </label>
           <p class="muted">Predictions use your logged history when available, falling back to these values.</p>
+        </div>
+
+        <div class="card">
+          <h2>Appearance</h2>
+          <label>Theme
+            <select id="set-theme">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
         </div>
 
         <div class="card">

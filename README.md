@@ -28,7 +28,10 @@ Typography (loaded from Google Fonts in `index.html`):
 - **IBM Plex Mono** (400) — data/captions: cycle numbers, tags, phase chips
 
 All colors and fonts are defined as CSS custom properties at the top of
-`css/styles.css`, so the whole app re-themes from one place.
+`css/styles.css`, so the whole app re-themes from one place. A **dark theme**
+(warm near-black, not pure black) is available via `[data-theme="dark"]`
+overrides; Settings → Appearance offers System / Light / Dark, applied before
+paint to avoid a flash.
 
 > Note: pure Stone Gray (`#9B9B9B`) fails contrast for small text on the light
 > background, so secondary text uses a slightly deeper stone (`--muted`) for

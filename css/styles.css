@@ -1,7 +1,10 @@
 :root {
+  color-scheme: light;
   /* HerRhythm palette — earthy, grounded, masculine (light theme) */
   --primary: #3A4D3E;        /* Deep Forest — grounded, strong foundation */
   --primary-press: #2F3F33;  /* pressed/active primary */
+  --primary-fg: #3A4D3E;     /* forest used as TEXT/outline (lightens in dark) */
+  --on-primary: #FAFAF8;     /* text on primary buttons (stays light both themes) */
   --secondary: #4A5A6F;      /* Slate Ink — intelligent, calm */
   --accent: #C67C4E;         /* Warm Ember — warmth, care, energy */
   --accent-2: #B06A3E;       /* deeper ember for hover/emphasis */
@@ -36,6 +39,47 @@
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
+
+/* Dark theme — warm, near-black "white space" (not pure black) */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #F4F1EA;
+  --text: #E7E3DB;
+  --muted: #9C988E;
+  --stone: #7C796F;
+
+  --bg: #191815;            /* warm near-black background */
+  --card: #232120;          /* card surface */
+  --card-2: #1E1D1A;        /* nested tiles, toward the bg */
+  --surface: #2A2824;       /* inputs / elevated (hero) */
+  --border: #34322C;
+  --hair: #3D3B33;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+
+  --primary: #3F5443;       /* forest button bg (light text reads on it) */
+  --primary-fg: #8FB39A;    /* lightened forest for text/outline */
+  --on-primary: #F4F1EA;
+  --secondary: #8FA2BE;
+  --accent: #CE8559;
+  --accent-2: #D2895C;
+
+  --menstrual: #C97D6D;
+  --follicular: #88A77E;
+  --ovulation: #CE8559;
+  --luteal: #8497B1;
+  --period: #C97D6D;
+  --fertile: #88A77E;
+}
+/* Phase chips/badges carry hardcoded text colors — lighten for dark */
+:root[data-theme="dark"] .phase-menstrual  { background: rgba(201, 125, 109, 0.18); color: #E0A294; }
+:root[data-theme="dark"] .phase-follicular { background: rgba(136, 167, 126, 0.20); color: #A9C7A0; }
+:root[data-theme="dark"] .phase-ovulation  { background: rgba(206, 133, 89, 0.20);  color: #E2A878; }
+:root[data-theme="dark"] .phase-luteal     { background: rgba(132, 151, 177, 0.20); color: #A6B7D2; }
+/* Calendar tints need a touch more presence on dark */
+:root[data-theme="dark"] .cal-menstrual  { background: rgba(201, 125, 109, 0.22); }
+:root[data-theme="dark"] .cal-follicular { background: rgba(136, 167, 126, 0.22); }
+:root[data-theme="dark"] .cal-ovulation  { background: rgba(206, 133, 89, 0.30); }
+:root[data-theme="dark"] .cal-luteal     { background: rgba(132, 151, 177, 0.22); }
 
 * { box-sizing: border-box; }
 
@@ -173,7 +217,7 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   border: none;
   border-radius: 9px;
   background: var(--primary);
-  color: var(--card);
+  color: var(--on-primary);
   font-family: var(--font-mono);
   font-size: 0.74rem;
   font-weight: 400;
@@ -301,7 +345,7 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
   font-style: italic;
   font-size: 1.25rem;
   line-height: 1.35;
-  color: var(--primary);
+  color: var(--primary-fg);
   border-top: 1px solid var(--border);
   padding-top: 16px;
   margin-top: 8px;
@@ -481,7 +525,7 @@ select {
   border-bottom: 1px solid var(--border);
 }
 .pattern-row:last-of-type { border-bottom: none; }
-.pattern-stage { width: 110px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+.pattern-stage { width: 110px; font-weight: 700; color: var(--primary-fg); flex-shrink: 0; }
 .pattern-data { font-size: 0.9rem; }
 
 .journal-item {
@@ -591,8 +635,8 @@ select {
 .cal-ovulation { background: rgba(198, 124, 78, 0.22); }
 .cal-luteal { background: rgba(74, 90, 111, 0.14); }
 .cal-logged { border-color: var(--menstrual); box-shadow: inset 0 -3px 0 var(--menstrual); }
-.cal-today { outline: 2px solid var(--primary); outline-offset: -1px; }
-.cal-today .cal-num { font-weight: 700; color: var(--primary); }
+.cal-today { outline: 2px solid var(--primary-fg); outline-offset: -1px; }
+.cal-today .cal-num { font-weight: 700; color: var(--primary-fg); }
 .cal-dot {
   position: absolute;
   bottom: 3px; left: 4px;

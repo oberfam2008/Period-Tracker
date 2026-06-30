@@ -1698,6 +1698,7 @@
     document.getElementById("set-birthday").value = data.birthday || "";
     document.getElementById("set-cycle").value = data.cycleLength;
     document.getElementById("set-period").value = data.periodLength;
+    document.getElementById("set-theme").value = data.theme || "system";
     document.getElementById("set-intimacy").checked = data.showIntimacy !== false;
     document.getElementById("set-positions").checked = data.showPositions !== false;
     var rem = data.reminders || {};
@@ -1830,6 +1831,12 @@
 
   function setupSettingsControls() {
     document.getElementById("set-birthday").addEventListener("change", updateSunPreview);
+
+    document.getElementById("set-theme").addEventListener("change", function () {
+      data.theme = document.getElementById("set-theme").value;
+      Store.save(data);
+      applyTheme();
+    });
 
     document.getElementById("set-save").addEventListener("click", function () {
       data.name = document.getElementById("set-name").value.trim();
@@ -1979,10 +1986,19 @@
     return Math.max(min, Math.min(max, n));
   }
 
+  function applyTheme() {
+    var t = (data && data.theme) || "system";
+    var dark = t === "dark" || (t === "system" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", dark ? "#191815" : "#3A4D3E");
+  }
+
   function init() {
     // Hydrate data from the (possibly async) storage backend before rendering.
     Store.init().then(function (loaded) {
       data = loaded;
+      applyTheme();
       setupTabs();
       setupHistoryControls();
       setupCalendarControls();
@@ -1993,6 +2009,15 @@
   }
 
   document.addEventListener("DOMContentLoaded", init);
+
+  // Re-apply theme when the OS preference changes (only matters in "system").
+  if (window.matchMedia) {
+    try {
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", function () {
+        if (((data && data.theme) || "system") === "system") applyTheme();
+      });
+    } catch (e) {}
+  }
 
   // Register the service worker for offline support + notifications.
   if ("serviceWorker" in navigator) {
