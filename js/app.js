@@ -133,32 +133,93 @@
         "🍜 Bring home takeout or her comfort food — cooking is the last thing she wants tonight.",
         "🛋️ Set up a cozy night in: heating pad, blanket, her favorite show.",
         "🧹 Quietly handle a chore or two without being asked.",
-        "😴 Keep plans low-key and let her rest as much as she needs."
+        "😴 Protect her sleep — take the early alarm, the kids, or the dog.",
+        "☕ Bring her a warm drink and her painkillers without being asked.",
+        "🛁 Run her a bath or hand her the evening completely off.",
+        "🍫 Pick up chocolate or whatever she craves on the way home.",
+        "📺 Suggest a low-effort night in over any obligation.",
+        "🤫 Keep the house calm — handle the noise and the logistics.",
+        "🌡️ Restock the essentials: pads/tampons, ibuprofen, her go-to snacks.",
+        "🧦 Little comforts: warm socks, a fresh water bottle, dim lights.",
+        "💬 A simple \"what would help right now?\" beats guessing.",
+        "🚗 Offer to run the errands she'd normally handle.",
+        "🤲 Offer a back or foot rub, no strings attached.",
+        "🍲 Make or order something warm and easy for dinner.",
+        "📱 Handle the texts and plans so she manages nothing today."
       ],
       hold: [
         "📅 Don't push big decisions or pack the weekend with plans.",
         "🙊 Skip criticism or \"why didn't you…\" questions today.",
-        "🎉 This isn't the week for a packed social calendar."
+        "🎉 This isn't the week for a packed social calendar.",
+        "🏋️ Don't nudge her toward anything strenuous.",
+        "🧾 Hold off on chore reminders or to-do lists.",
+        "⏰ Avoid early starts or rushing her out the door.",
+        "🌶️ Don't take low energy or short answers personally.",
+        "🗣️ Don't try to fix her mood — just make space for it.",
+        "💼 Postpone heavy or stressful conversations if you can.",
+        "🍻 Skip the late night out that'll leave her drained."
       ]
     },
     follicular: {
       good: [
         "✨ Suggest a date or try something new together — her energy is climbing.",
         "💬 Good window to talk through plans or decisions; she's more open now.",
-        "🚗 Be a little spontaneous — she's up for an adventure."
+        "🚗 Be a little spontaneous — she's up for an adventure.",
+        "🏃 Invite her to something active — a walk, a class, a hike.",
+        "📝 Bring up that idea or project you've been sitting on.",
+        "🍽️ Book the reservation; she'll be game.",
+        "🎟️ Plan something a week or two out — she'll enjoy the anticipation.",
+        "🤝 Start a new shared habit now; it'll stick better.",
+        "😄 Keep it playful and flirty — she's receptive.",
+        "🧭 Try a new spot — a café, trail, or neighborhood you haven't explored.",
+        "🎨 Do something creative together; her motivation is up.",
+        "📸 Make a small plan worth remembering.",
+        "🙌 Encourage that goal she's been eyeing — she has momentum.",
+        "🍳 Cook something new together rather than ordering in.",
+        "👫 Say yes to seeing friends; she's sociable.",
+        "🗓️ Lock in a future trip or event you'll both look forward to."
       ],
       hold: [
-        "🐢 Don't assume she still wants the quiet routine of last week."
+        "🐢 Don't assume she still wants last week's quiet routine.",
+        "🛑 Don't smother the momentum with too much structure.",
+        "📉 Don't bury the mood in heavy logistics.",
+        "🤐 Don't forget to actually listen when she shares ideas.",
+        "🔁 Don't default to the same old plan — she wants a little fresh.",
+        "⏳ Don't sit on plans — strike while her energy's up.",
+        "📵 Don't let screens eat the evening you could spend together.",
+        "🙄 Don't dismiss a new idea just because it's unfamiliar.",
+        "😴 Don't over-schedule her to the point of burning out early."
       ]
     },
     ovulation: {
       good: [
         "💃 Plan a date night — she's feeling her most confident and social.",
         "💕 Compliments and affection really land today.",
-        "🌟 A great time for a deeper conversation or making plans together."
+        "🌟 A great time for a deeper conversation or making plans together.",
+        "🥂 Make tonight feel a little special, even simply.",
+        "📸 Do something memorable together.",
+        "🗣️ Tell her specifically what you love about her.",
+        "🌹 A small romantic gesture goes a long way right now.",
+        "🍷 Linger over dinner; she's in a connecting mood.",
+        "👫 Say yes to seeing friends — she'll shine.",
+        "💋 Be physically affectionate; she's most receptive now.",
+        "🎶 Put on music, dance in the kitchen, keep it light and warm.",
+        "🌆 Get out together — she's drawn to people and energy.",
+        "🤍 Really listen; connection matters more than fixing anything.",
+        "📷 Capture the moment — a photo, a note, something to keep.",
+        "🥰 Initiate closeness and let her know she's wanted.",
+        "🍓 Plan a treat or experience she'll love."
       ],
       hold: [
-        "⏳ Don't let the day slip by without some quality time."
+        "⏳ Don't let the day slip by without some quality time.",
+        "📱 Don't be glued to your phone tonight.",
+        "🥱 Don't waste her best mood on chores and errands.",
+        "🙅 Don't pick this moment to raise a grievance.",
+        "🤖 Don't keep it all logistics — be present.",
+        "🚪 Don't disappear into work all evening.",
+        "😐 Don't be lukewarm; meet her warmth with warmth.",
+        "🗓️ Don't double-book the night with obligations.",
+        "🧊 Don't let a small annoyance cool the mood."
       ]
     },
     luteal: {
@@ -166,12 +227,31 @@
         "🍫 Stock up on her favorite snacks and treats.",
         "🤗 Lead with patience and reassurance — a little goes a long way.",
         "🧺 Lighten her load: handle dishes, errands, or dinner.",
-        "🕯️ A cozy night in beats a big night out right now."
+        "🕯️ A cozy night in beats a big night out right now.",
+        "🛋️ Take something off her plate before she has to ask.",
+        "☕ Small comforts — her drink, her blanket, her show.",
+        "🚿 Give her some uninterrupted time to herself.",
+        "🧠 Don't take moodiness personally; stay steady.",
+        "🌙 Keep the evening calm and predictable.",
+        "💬 Check in gently: \"what would help right now?\"",
+        "🛁 Encourage her to unwind — a bath, a walk, an early night.",
+        "🍵 Have her comfort snacks and a warm drink ready.",
+        "🤲 Offer a back rub or just quiet company.",
+        "📵 Shield her from extra obligations and noise.",
+        "🧹 Pre-empt the stressors — tidy up, handle the small stuff.",
+        "🫶 Reassure her you're on her team, whatever the mood."
       ],
       hold: [
         "💸 Today may not be the day to bring up money or big plans.",
         "🤐 Steer clear of criticism or other sensitive topics.",
-        "📵 Don't overcommit her to social events."
+        "📵 Don't overcommit her to social events.",
+        "🗣️ Don't try to 'fix' her feelings — just acknowledge them.",
+        "⏰ Don't add pressure or tight deadlines.",
+        "🍷 Go easy on plans that run late and drain her.",
+        "🔥 Don't match her irritability — be the calm one.",
+        "🧾 Don't pile on chores or to-do reminders.",
+        "😤 Don't escalate a small disagreement.",
+        "🎢 Don't spring surprises or last-minute changes."
       ]
     }
   };
@@ -183,10 +263,36 @@
     Water: "💧 Lead with empathy; acknowledge her feelings before jumping to solutions."
   };
 
+  // Seeded RNG (mulberry32) — deterministic per seed, so a given day always
+  // produces the same picks but consecutive days differ.
+  function makeRng(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // Pick n distinct items from arr using rng (no repeats within a day).
+  function sampleFrom(rng, arr, n) {
+    var copy = arr.slice(), out = [];
+    n = Math.min(n, copy.length);
+    for (var i = 0; i < n; i++) {
+      out.push(copy.splice(Math.floor(rng() * copy.length), 1)[0]);
+    }
+    return out;
+  }
+
+  // Distinct per-phase seed offsets so phases don't rotate in lockstep.
+  var TIP_SEED = { menstrual: 11, follicular: 23, ovulation: 37, luteal: 53 };
+
   function buildTips(phase, moon, sunSign) {
     var t = PHASE_TIPS[phase.key];
-    var good = t.good.slice();
-    var hold = t.hold.slice();
+    // Seed from the calendar day so the set is stable today and fresh tomorrow.
+    var rng = makeRng(dailySeed(new Date()) + (TIP_SEED[phase.key] || 0));
+    var good = sampleFrom(rng, t.good, 4);
+    var hold = sampleFrom(rng, t.hold, 3);
 
     if (sunSign && ELEMENT_TIP[sunSign.element]) {
       good.push(ELEMENT_TIP[sunSign.element]);
