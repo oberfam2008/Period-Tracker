@@ -1585,7 +1585,6 @@
       return '<button class="trip-item' + (isTop ? " trip-top" : "") + '" data-month="' +
           w.start.getFullYear() + "-" + w.start.getMonth() + '">' +
         '<div class="trip-dates">' + (isTop ? "⭐ " : "") + fmtWd(w.start) + " – " + fmtWd(w.end) + "</div>" +
-        '<div class="trip-reason">' + w.reason + "</div>" +
       "</button>";
     }).join("");
     el.innerHTML = header +
