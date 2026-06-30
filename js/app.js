@@ -1165,9 +1165,8 @@
       container.innerHTML = "";
       return;
     }
-    var srcNote = pred.cycleSource === "history"
-      ? "Based on her logged history."
-      : "Based on the default cycle length (log 2+ periods for personalized predictions).";
+    var cycleNote = pred.cycleSource === "history" ? "from her logs" : "default";
+    var periodNote = pred.periodSource === "history" ? "from her logs" : "default";
 
     container.innerHTML =
       '<div class="card">' +
@@ -1178,7 +1177,11 @@
           predTile("dot-fertile", "Fertile window", fmtShort(pred.fertileStart) + "–" + fmtShort(pred.fertileEnd), "") +
         "</div>" +
         '<p class="muted" style="margin-top:14px">Average cycle: <strong>' + pred.cycleLength +
-          " days</strong>. " + srcNote + "</p>" +
+          " days</strong> (" + cycleNote + ") · Average period: <strong>" + pred.periodLength +
+          " days</strong> (" + periodNote + ").</p>" +
+        (pred.periodSource === "default"
+          ? '<p class="muted">Add last days to logged periods below to personalize period length.</p>'
+          : "") +
       "</div>";
   }
 
@@ -1200,20 +1203,25 @@
       .map(function (p) { return new Date(p + "T00:00:00"); })
       .sort(function (a, b) { return b - a; });
 
+    var ends = data.periodEnds || {};
     var html = '<div class="card"><h2>Logged periods</h2>';
     for (var i = 0; i < starts.length; i++) {
       var d = starts[i];
       var iso = toIso(d);
-      var meta = "";
-      if (i < starts.length - 1) {
-        var gap = Cycle.daysBetween(starts[i + 1], d);
-        meta = gap + "-day cycle";
-      } else {
-        meta = "first logged";
-      }
+      var meta = (i < starts.length - 1)
+        ? Cycle.daysBetween(starts[i + 1], d) + "-day cycle"
+        : "first logged";
+      var end = ends[iso];
+      var durMeta = end
+        ? " · " + (Cycle.daysBetween(new Date(iso + "T00:00:00"), new Date(end + "T00:00:00")) + 1) + "-day period"
+        : " · length not set";
       html += '<div class="history-item">' +
-        "<div><div>" + fmt(d) + "</div><div class=\"meta\">" + meta + "</div></div>" +
-        '<button data-del="' + iso + '">Remove</button>' +
+        '<div class="hist-main"><div>' + fmt(d) + "</div>" +
+          '<div class="meta">' + meta + durMeta + "</div></div>" +
+        '<div class="hist-controls">' +
+          '<label class="end-label">ended <input type="date" data-end="' + iso + '" min="' + iso + '" value="' + (end || "") + '" /></label>' +
+          '<button data-del="' + iso + '">Remove</button>' +
+        "</div>" +
       "</div>";
     }
     html += "</div>";
@@ -1223,6 +1231,19 @@
       btn.addEventListener("click", function () {
         var iso = btn.getAttribute("data-del");
         data.periods = data.periods.filter(function (p) { return p !== iso; });
+        delete data.periodEnds[iso];
+        Store.save(data);
+        renderHistory();
+        renderDaily();
+      });
+    });
+
+    container.querySelectorAll("[data-end]").forEach(function (inp) {
+      inp.addEventListener("change", function () {
+        var start = inp.getAttribute("data-end");
+        var val = inp.value;
+        if (val && val >= start) data.periodEnds[start] = val;
+        else delete data.periodEnds[start];
         Store.save(data);
         renderHistory();
         renderDaily();
@@ -1381,16 +1402,18 @@
 
   function setupHistoryControls() {
     var dateInput = document.getElementById("log-date");
+    var endInput = document.getElementById("log-end");
     dateInput.value = toIso(new Date());
     document.getElementById("log-add").addEventListener("click", function () {
       var v = dateInput.value;
       if (!v) return;
-      if (data.periods.indexOf(v) === -1) {
-        data.periods.push(v);
-        Store.save(data);
-        renderHistory();
-        renderDaily();
-      }
+      if (data.periods.indexOf(v) === -1) data.periods.push(v);
+      var end = endInput.value;
+      if (end && end >= v) data.periodEnds[v] = end;
+      Store.save(data);
+      endInput.value = "";
+      renderHistory();
+      renderDaily();
     });
   }
 

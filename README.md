@@ -70,10 +70,13 @@ largely drive it. Notes are scanned for a small mood vocabulary to surface
 "what you've noticed before" in each phase.
 
 ### 📊 History tab
-- Log the first day of each period
+- Log the first day of each period (and optionally the last day)
 - See **next-period**, **ovulation**, and **fertile-window** estimates
-- Average **cycle length** computed from your own logged history
-- Full list of logged periods with per-cycle gaps
+- Average **cycle length** computed from your own logged history (start-date gaps)
+- Average **period length** learned from logged end dates (inclusive duration),
+  falling back to the Settings value until end dates exist
+- Full list of logged periods with per-cycle gaps and durations; set or edit any
+  period's last day inline
 
 ### ⚙️ Settings tab
 - Name and **birthday** (drives your sun sign)

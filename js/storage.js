@@ -28,6 +28,7 @@
     lastBackupAt: "",    // ISO datetime of the last export, for the backup nudge
     backupSnoozeUntil: "", // ISO datetime to suppress the backup nudge until
     periods: [],         // array of "YYYY-MM-DD" period start dates
+    periodEnds: {},      // map of startISO -> endISO (optional), for learning period length
     notes: [],           // [{ id, date, text }]
     encounters: []       // [{ id, date, desire:1-5, adventure:1-5, initiator:"her"|"him"|"mutual" }]
   };

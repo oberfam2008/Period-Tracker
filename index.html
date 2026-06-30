@@ -33,9 +33,10 @@
       <section id="history" class="panel" role="tabpanel">
         <div class="card log-card">
           <h2>Log a period</h2>
-          <p class="muted">Record the first day of her period to improve predictions.</p>
+          <p class="muted">Record the first day of her period. Add the last day too (optional) and the app will learn her average period length over time.</p>
           <div class="log-row">
-            <input type="date" id="log-date" />
+            <label>First day<input type="date" id="log-date" /></label>
+            <label>Last day (optional)<input type="date" id="log-end" /></label>
             <button id="log-add" class="btn">Add period</button>
           </div>
         </div>

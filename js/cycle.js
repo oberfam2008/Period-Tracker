@@ -52,16 +52,34 @@
     return { length: Math.round(avg), source: "history" };
   }
 
+  /* Average period (bleeding) length from logged end dates; falls back to default.
+   * periodEnds is a map of startISO -> endISO; duration is inclusive (day 1 = start). */
+  function averagePeriodLength(periodEnds, fallback) {
+    if (!periodEnds) return { length: fallback, source: "default" };
+    var durations = [];
+    Object.keys(periodEnds).forEach(function (start) {
+      var end = periodEnds[start];
+      if (!end) return;
+      var len = daysBetween(parseLocalDate(start), parseLocalDate(end)) + 1;
+      if (len >= 1 && len <= 15) durations.push(len); // ignore implausible entries
+    });
+    if (!durations.length) return { length: fallback, source: "default" };
+    var avg = durations.reduce(function (s, d) { return s + d; }, 0) / durations.length;
+    return { length: Math.round(avg), source: "history" };
+  }
+
   /* Build a full prediction object. `today` defaults to now. */
   function predict(periods, settings, today) {
     today = toMidnight(today || new Date());
     var starts = sortedStarts(periods);
     var cycleInfo = averageCycle(periods, settings.cycleLength || 28);
     var cycleLen = cycleInfo.length;
-    var periodLen = settings.periodLength || 5;
+    var periodInfo = averagePeriodLength(settings.periodEnds, settings.periodLength || 5);
+    var periodLen = periodInfo.length;
 
     if (!starts.length) {
-      return { hasData: false, cycleLength: cycleLen, periodLength: periodLen, cycleSource: cycleInfo.source };
+      return { hasData: false, cycleLength: cycleLen, periodLength: periodLen,
+        cycleSource: cycleInfo.source, periodSource: periodInfo.source };
     }
 
     var lastStart = starts[starts.length - 1];
@@ -88,6 +106,7 @@
       cycleLength: cycleLen,
       periodLength: periodLen,
       cycleSource: cycleInfo.source,
+      periodSource: periodInfo.source,
       cycleStart: cycleStart,
       dayOfCycle: dayOfCycle,
       nextPeriod: nextPeriod,
@@ -139,7 +158,7 @@
     }
     if (cycleLen < 15 || cycleLen > 60) cycleLen = settings.cycleLength || 28;
 
-    var periodLen = settings.periodLength || 5;
+    var periodLen = averagePeriodLength(settings.periodEnds, settings.periodLength || 5).length;
     var dayOfCycle = daysBetween(start, date) + 1;
     var nextPeriod = addDays(start, cycleLen);
     var ovulation = addDays(nextPeriod, -14);
@@ -161,6 +180,7 @@
   global.Cycle = {
     predict: predict,
     averageCycle: averageCycle,
+    averagePeriodLength: averagePeriodLength,
     classifyDate: classifyDate,
     addDays: addDays,
     daysBetween: daysBetween
