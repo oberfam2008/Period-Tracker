@@ -491,12 +491,76 @@ select {
   text-transform: uppercase;
 }
 
+/* Calendar */
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cal-head h2 { margin: 0; font-family: var(--font-display); font-weight: 600; }
+.cal-nav {
+  background: var(--card-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.cal-nav:hover { background: var(--bg); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-dow {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding-bottom: 4px;
+}
+.cal-cell {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 3px 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.cal-empty { border: none; background: transparent; }
+.cal-num { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text); }
+.cal-marks { font-size: 0.62rem; line-height: 1; text-align: right; }
+.cal-menstrual { background: rgba(158, 74, 60, 0.16); }
+.cal-follicular { background: rgba(90, 115, 85, 0.16); }
+.cal-ovulation { background: rgba(198, 124, 78, 0.22); }
+.cal-luteal { background: rgba(74, 90, 111, 0.14); }
+.cal-logged { border-color: var(--menstrual); box-shadow: inset 0 -3px 0 var(--menstrual); }
+.cal-today { outline: 2px solid var(--primary); outline-offset: -1px; }
+.cal-today .cal-num { font-weight: 700; color: var(--primary); }
+.cal-dot {
+  position: absolute;
+  bottom: 3px; left: 4px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--secondary);
+}
+.cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-top: 16px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.cal-legend .lg { display: inline-flex; align-items: center; gap: 5px; }
+.cal-legend .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid var(--border); }
+
 .app-footer { margin-top: 24px; text-align: center; }
 
 @media (max-width: 480px) {
   .cosmic-grid { grid-template-columns: 1fr; }
   .pred-grid { grid-template-columns: 1fr; }
   .tips-cols { grid-template-columns: 1fr; }
-  .tab { font-size: 0.85rem; padding: 10px 4px; }
+  .tab { font-size: 0.74rem; padding: 10px 2px; }
+  .cal-num { font-size: 0.7rem; }
+  .cal-cell { padding: 2px 3px; }
   .log-row { flex-direction: column; align-items: stretch; }
 }

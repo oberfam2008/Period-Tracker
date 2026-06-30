@@ -1278,6 +1278,123 @@
     });
   }
 
+  /* ---------- Calendar tab ---------- */
+
+  var calMonth = null; // first-of-month Date currently displayed
+
+  function calendarModel() {
+    var starts = (data.periods || [])
+      .map(function (p) { return new Date(p + "T00:00:00"); })
+      .sort(function (a, b) { return a - b; });
+    return {
+      starts: starts,
+      cyc: Cycle.averageCycle(data.periods, data.cycleLength || 28).length,
+      per: Cycle.averagePeriodLength(data.periodEnds, data.periodLength || 5).length
+    };
+  }
+
+  // Is this date within a logged period (start..end, or start..start+per-1)?
+  function isLoggedPeriodDay(d, model) {
+    var ends = data.periodEnds || {};
+    for (var i = 0; i < model.starts.length; i++) {
+      var s = model.starts[i];
+      var endIso = ends[toIso(s)];
+      var end = endIso ? new Date(endIso + "T00:00:00") : Cycle.addDays(s, model.per - 1);
+      if (d >= s && d <= end) return true;
+    }
+    return false;
+  }
+
+  // Phase/markers for a calendar date, projecting forward past the last log.
+  function calDayInfo(d, model) {
+    var starts = model.starts;
+    if (!starts.length || d < starts[0]) return {};
+    var base = null, baseIdx = -1;
+    for (var i = 0; i < starts.length; i++) {
+      if (starts[i] <= d) { base = starts[i]; baseIdx = i; }
+    }
+    var cs = base, projected = false;
+    if (baseIdx === starts.length - 1) { // beyond last log -> project by avg cycle
+      var k = Math.floor(Cycle.daysBetween(cs, d) / model.cyc);
+      if (k > 0) { cs = Cycle.addDays(cs, k * model.cyc); projected = true; }
+    }
+    var doc = Cycle.daysBetween(cs, d) + 1;
+    var ovuDay = model.cyc - 13;
+    var info = { dayOfCycle: doc, projected: projected };
+    if (doc <= model.per) info.phase = "menstrual";
+    else if (doc === ovuDay) info.phase = "ovulation";
+    else if (doc < ovuDay) info.phase = "follicular";
+    else info.phase = "luteal";
+    info.fertile = (doc >= ovuDay - 5 && doc <= ovuDay && info.phase !== "ovulation");
+    info.logged = isLoggedPeriodDay(d, model);
+    return info;
+  }
+
+  function loggedDataDays() {
+    var set = {};
+    (data.notes || []).forEach(function (n) { set[n.date] = true; });
+    (data.encounters || []).forEach(function (e) { set[e.date] = true; });
+    return set;
+  }
+
+  function renderCalendar() {
+    if (!calMonth) calMonth = new Date((new Date()).getFullYear(), (new Date()).getMonth(), 1);
+    document.getElementById("cal-title").textContent =
+      calMonth.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+
+    var model = calendarModel();
+    var dataDays = loggedDataDays();
+    var y = calMonth.getFullYear(), m = calMonth.getMonth();
+    var startDow = new Date(y, m, 1).getDay();
+    var daysIn = new Date(y, m + 1, 0).getDate();
+    var todayIso = toIso(new Date());
+
+    var html = '<div class="cal-grid">';
+    ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].forEach(function (d) {
+      html += '<div class="cal-dow">' + d + "</div>";
+    });
+    for (var b = 0; b < startDow; b++) html += '<div class="cal-cell cal-empty"></div>';
+    for (var day = 1; day <= daysIn; day++) {
+      var d = new Date(y, m, day);
+      var iso = toIso(d);
+      var info = calDayInfo(d, model);
+      var cls = ["cal-cell"];
+      if (info.phase) cls.push("cal-" + info.phase);
+      if (info.logged) cls.push("cal-logged");
+      if (iso === todayIso) cls.push("cal-today");
+      var marks = "";
+      if (info.phase === "ovulation") marks += "⭐";
+      else if (info.fertile) marks += "💧";
+      if (info.logged) marks += "🩸";
+      var dot = dataDays[iso] ? '<span class="cal-dot"></span>' : "";
+      html += '<div class="' + cls.join(" ") + '">' +
+        '<span class="cal-num">' + day + "</span>" +
+        '<span class="cal-marks">' + marks + "</span>" + dot +
+      "</div>";
+    }
+    html += "</div>";
+    document.getElementById("cal-grid").innerHTML = html;
+
+    document.getElementById("cal-legend").innerHTML = model.starts.length
+      ? '<span class="lg"><span class="sw cal-menstrual"></span>Menstrual</span>' +
+        '<span class="lg"><span class="sw cal-follicular"></span>Follicular</span>' +
+        '<span class="lg"><span class="sw cal-ovulation"></span>Ovulation</span>' +
+        '<span class="lg"><span class="sw cal-luteal"></span>Luteal</span>' +
+        '<span class="lg">⭐ ovulation · 💧 fertile · 🩸 logged period · • note/intimacy</span>'
+      : '<span class="muted">Log a period in History to populate the calendar.</span>';
+  }
+
+  function setupCalendarControls() {
+    document.getElementById("cal-prev").addEventListener("click", function () {
+      calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() - 1, 1);
+      renderCalendar();
+    });
+    document.getElementById("cal-next").addEventListener("click", function () {
+      calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 1);
+      renderCalendar();
+    });
+  }
+
   /* ---------- Journal tab ---------- */
 
   var STAGE_LABEL = {
@@ -1420,6 +1537,7 @@
         document.querySelectorAll(".panel").forEach(function (p) { p.classList.remove("active"); });
         document.getElementById(name).classList.add("active");
         if (name === "daily") renderDaily();
+        if (name === "calendar") renderCalendar();
         if (name === "history") renderHistory();
         if (name === "journal") renderJournal();
         if (name === "settings") renderSettings();
@@ -1624,6 +1742,7 @@
       data = loaded;
       setupTabs();
       setupHistoryControls();
+      setupCalendarControls();
       setupJournalControls();
       setupSettingsControls();
       renderDaily();
