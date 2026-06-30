@@ -10,6 +10,17 @@
     return x;
   }
 
+  // Parse a "YYYY-MM-DD" string as LOCAL midnight (not UTC). Using new Date(str)
+  // on a date-only string parses as UTC, which shifts the day backward for
+  // users behind UTC and throws cycle-day counts off by one. Constructing from
+  // components keeps everything in the user's own timezone.
+  function parseLocalDate(value) {
+    if (value instanceof Date) return toMidnight(value);
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(value));
+    if (m) return new Date(+m[1], +m[2] - 1, +m[3]);
+    return toMidnight(new Date(value));
+  }
+
   function daysBetween(a, b) {
     return Math.round((toMidnight(b) - toMidnight(a)) / DAY);
   }
@@ -23,7 +34,7 @@
   /* Sorted ascending array of period-start Date objects. */
   function sortedStarts(periods) {
     return periods
-      .map(function (p) { return toMidnight(new Date(p)); })
+      .map(function (p) { return parseLocalDate(p); })
       .sort(function (a, b) { return a - b; });
   }
 
