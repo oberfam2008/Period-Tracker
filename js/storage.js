@@ -27,6 +27,7 @@
     showPositions: true, // show the suggested-position idea within that card
     reminders: { enabled: false, period: true, ovulation: true, pms: true, phase: true },
     lastNotified: {},    // map of reminder key -> ISO date it last fired (per-day dedupe)
+    tripType: "week",    // suggested-trip length: "weekend" (Fri–Sun) or "week" (Sun–Sun)
     lastBackupAt: "",    // ISO datetime of the last export, for the backup nudge
     backupSnoozeUntil: "", // ISO datetime to suppress the backup nudge until
     periods: [],         // array of "YYYY-MM-DD" period start dates

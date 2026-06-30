@@ -511,8 +511,10 @@ select {
 }
 .trip-item:hover { border-color: var(--accent); }
 .trip-top { border-color: var(--accent); background: rgba(198, 124, 78, 0.10); }
-.trip-dates { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; }
+.trip-dates { font-family: var(--font-mono); font-size: 0.82rem; font-weight: 600; }
 .trip-reason { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+.trip-type { display: block; margin-bottom: 12px; font-size: 0.85rem; color: var(--muted); }
+.trip-type select { margin-top: 6px; }
 @media (max-width: 720px) {
   .cal-layout { flex-direction: column; }
   .cal-layout > .cal-main, .cal-side { width: 100%; }

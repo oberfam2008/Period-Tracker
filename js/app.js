@@ -1459,13 +1459,21 @@
     });
   }
 
-  /* ---------- Suggested trip weeks ----------
-   * Scores each Sunday–Saturday week over the next year by how much of it falls
-   * in her high-energy window (follicular → ovulation), and surfaces the best
-   * week per projected cycle. */
-  function startOfWeekSunday(d) {
+  /* ---------- Suggested trip windows ----------
+   * Scores candidate windows over the next year by how much falls in her
+   * high-energy window (follicular → ovulation), and surfaces the best one per
+   * projected cycle. Trip length is selectable. */
+  var TRIP_TYPES = {
+    weekend: { label: "Weekend (Fri–Sun)", startDow: 5, length: 3 },
+    week:    { label: "Week (Sun–Sun)",    startDow: 0, length: 8 }
+  };
+
+  function tripType() { return TRIP_TYPES[data.tripType] ? data.tripType : "week"; }
+
+  // Back up to the most recent occurrence of weekday `dow` (0=Sun..6=Sat).
+  function alignToDow(d, dow) {
     var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    x.setDate(x.getDate() - x.getDay()); // back up to Sunday
+    x.setDate(x.getDate() - ((x.getDay() - dow + 7) % 7));
     return x;
   }
 
@@ -1481,10 +1489,10 @@
     return 1;
   }
 
-  function weekScore(sunday, model) {
+  function windowScore(start, model, length) {
     var total = 0, phases = {};
-    for (var i = 0; i < 7; i++) {
-      var d = Cycle.addDays(sunday, i);
+    for (var i = 0; i < length; i++) {
+      var d = Cycle.addDays(start, i);
       var info = calDayInfo(d, model);
       total += tripWeight(info, model.cyc);
       if (info.phase) phases[info.phase] = (phases[info.phase] || 0) + 1;
@@ -1504,9 +1512,10 @@
   function computeTripWeeks() {
     var model = calendarModel();
     if (!model.starts.length) return [];
+    var t = TRIP_TYPES[tripType()];
     var cyc = model.cyc;
     var today = new Date(); today.setHours(0, 0, 0, 0);
-    var thisSunday = startOfWeekSunday(today);
+    var firstStart = alignToDow(today, t.startDow);
     var lastStart = model.starts[model.starts.length - 1];
     var horizon = new Date(today); horizon.setFullYear(horizon.getFullYear() + 1);
 
@@ -1515,52 +1524,77 @@
       var cs = Cycle.addDays(lastStart, k * cyc);
       k++;
       if (cs > horizon) break;
-      var center = Cycle.addDays(cs, (cyc - 14) - 1); // day before ovulation
-      if (Cycle.addDays(center, 3) < today) continue; // whole window already past
-      var base = startOfWeekSunday(center);
+      var center = Cycle.addDays(cs, (cyc - 14) - Math.floor(t.length / 2)); // peak, centered for the length
+      if (Cycle.addDays(center, t.length) < today) continue; // whole window already past
+      var base = alignToDow(center, t.startDow);
       var best = null;
       [-1, 0, 1].forEach(function (off) {
-        var sun = Cycle.addDays(base, off * 7);
-        if (sun < thisSunday || sun > horizon) return;
-        var sc = weekScore(sun, model);
-        if (!best || sc.total > best.score) best = { sunday: sun, score: sc.total, phases: sc.phases };
+        var start = Cycle.addDays(base, off * 7);
+        if (start < firstStart || start > horizon) return;
+        var sc = windowScore(start, model, t.length);
+        if (!best || sc.total > best.score) best = { start: start, score: sc.total, phases: sc.phases };
       });
-      if (best && !seen[toIso(best.sunday)]) {
-        seen[toIso(best.sunday)] = true;
-        best.saturday = Cycle.addDays(best.sunday, 6);
+      if (best && !seen[toIso(best.start)]) {
+        seen[toIso(best.start)] = true;
+        best.end = Cycle.addDays(best.start, t.length - 1);
         best.reason = tripReason(best.phases);
         weeks.push(best);
       }
     }
-    weeks.sort(function (a, b) { return a.sunday - b.sunday; });
+    weeks.sort(function (a, b) { return a.start - b.start; });
     return weeks;
+  }
+
+  function fmtWd(date) {
+    return date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  }
+
+  function tripSelectorHtml() {
+    var cur = tripType();
+    var opts = Object.keys(TRIP_TYPES).map(function (key) {
+      return '<option value="' + key + '"' + (key === cur ? " selected" : "") + ">" + TRIP_TYPES[key].label + "</option>";
+    }).join("");
+    return '<label class="trip-type">Trip length <select id="trip-type-sel">' + opts + "</select></label>";
+  }
+
+  function wireTripSelector() {
+    var sel = document.getElementById("trip-type-sel");
+    if (sel) sel.addEventListener("change", function () {
+      data.tripType = sel.value;
+      Store.save(data);
+      renderTripWeeks();
+    });
   }
 
   function renderTripWeeks() {
     var el = document.getElementById("trip-weeks");
     if (!el) return;
     var weeks = computeTripWeeks();
+    var header = '<div class="card"><h2>Trip windows</h2>' + tripSelectorHtml();
     if (!weeks.length) {
-      el.innerHTML = '<div class="card"><h2>Trip windows</h2>' +
-        '<p class="muted">Log a period in History to get suggested trip weeks for the year ahead.</p></div>';
+      el.innerHTML = header +
+        '<p class="muted">Log a period in History to get suggested trip windows for the year ahead.</p></div>';
+      wireTripSelector();
       return;
     }
     var maxScore = weeks.reduce(function (m, w) { return Math.max(m, w.score); }, 0);
-    var topIso = null; // star only the soonest best week, not every tie
-    weeks.forEach(function (w) { if (topIso === null && w.score === maxScore) topIso = toIso(w.sunday); });
+    var topIso = null; // star only the soonest best window, not every tie
+    weeks.forEach(function (w) { if (topIso === null && w.score === maxScore) topIso = toIso(w.start); });
     var rows = weeks.map(function (w) {
-      var isTop = toIso(w.sunday) === topIso;
+      var isTop = toIso(w.start) === topIso;
       return '<button class="trip-item' + (isTop ? " trip-top" : "") + '" data-month="' +
-          w.sunday.getFullYear() + "-" + w.sunday.getMonth() + '">' +
-        '<div class="trip-dates">' + (isTop ? "⭐ " : "") + fmtShort(w.sunday) + " – " + fmtShort(w.saturday) + "</div>" +
+          w.start.getFullYear() + "-" + w.start.getMonth() + '">' +
+        '<div class="trip-dates">' + (isTop ? "⭐ " : "") + fmtWd(w.start) + " – " + fmtWd(w.end) + "</div>" +
         '<div class="trip-reason">' + w.reason + "</div>" +
       "</button>";
     }).join("");
-    el.innerHTML = '<div class="card"><h2>Trip windows</h2>' +
-      '<p class="muted">Best Sunday–Saturday weeks for a getaway over the next year, ranked by her high-energy window. ⭐ marks the strongest.</p>' +
+    el.innerHTML = header +
+      '<p class="muted">Best ' + TRIP_TYPES[tripType()].label.toLowerCase() +
+        ' getaways over the next year, ranked by her high-energy window. ⭐ marks the strongest.</p>' +
       rows +
-      '<p class="muted" style="margin-top:8px">Estimates from her average cycle — weeks further out are less certain.</p></div>';
+      '<p class="muted" style="margin-top:8px">Estimates from her average cycle — windows further out are less certain.</p></div>';
 
+    wireTripSelector();
     el.querySelectorAll(".trip-item").forEach(function (b) {
       b.addEventListener("click", function () {
         var mp = b.getAttribute("data-month").split("-");
