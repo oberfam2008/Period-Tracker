@@ -1044,6 +1044,67 @@
 
   /* ---------- Daily tab ---------- */
 
+  /* ---------- Reminders / notifications ----------
+   * Web notifications fire when the app is open/loaded (no backend push). The
+   * Capacitor build can swap in @capacitor/local-notifications for true
+   * scheduled alerts. Each reminder fires at most once per day (deduped).
+   */
+  function notify(body, tag) {
+    try {
+      if (!("Notification" in window) || Notification.permission !== "granted") return;
+      var opts = { body: body, tag: tag, icon: "icons/icon.svg", badge: "icons/icon.svg" };
+      if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+        navigator.serviceWorker.ready
+          .then(function (reg) { reg.showNotification("HerRhythm", opts); })
+          .catch(function () { try { new Notification("HerRhythm", opts); } catch (e) {} });
+      } else {
+        new Notification("HerRhythm", opts);
+      }
+    } catch (e) {}
+  }
+
+  function dueReminders(pred, today) {
+    var out = [];
+    if (!pred.hasData) return out;
+    var r = data.reminders || {};
+    var nm = data.name || "She";
+    var poss = data.name ? data.name + "’s" : "Her";
+
+    if (r.period) {
+      if (pred.isLate) out.push({ key: "period-late", body: poss + " period is " + pred.daysLate + " day" + (pred.daysLate === 1 ? "" : "s") + " late." });
+      else if (pred.daysUntilNext === 0) out.push({ key: "period-today", body: poss + " period may start today." });
+      else if (pred.daysUntilNext === 1) out.push({ key: "period-tomorrow", body: poss + " period is likely to start tomorrow." });
+    }
+    if (r.ovulation) {
+      if (pred.isOvulationDay) out.push({ key: "ovulation", body: "Ovulation today — a great day for a real date." });
+      else if (Cycle.daysBetween(today, pred.fertileStart) === 0) out.push({ key: "fertile-open", body: poss + " fertile window opens today." });
+    }
+    if (r.pms && !pred.isLate && pred.daysUntilNext === 3) {
+      out.push({ key: "pms", body: "Heads-up: PMS window ahead — lead with patience this week." });
+    }
+    if (r.phase) {
+      var ovuDay = pred.cycleLength - 13;
+      if (pred.dayOfCycle === pred.periodLength + 1) out.push({ key: "phase-follicular", body: nm + " is heading into her higher-energy stretch." });
+      else if (pred.dayOfCycle === ovuDay + 2) out.push({ key: "phase-luteal", body: nm + " is entering the wind-down phase — patience helps." });
+    }
+    return out;
+  }
+
+  function runReminders(pred, today) {
+    if (!data.reminders || !data.reminders.enabled) return;
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    var todayIso = toIso(today);
+    if (!data.lastNotified) data.lastNotified = {};
+    var fired = false;
+    dueReminders(pred, today).forEach(function (d) {
+      if (data.lastNotified[d.key] === todayIso) return;
+      notify(d.body, d.key);
+      data.lastNotified[d.key] = todayIso;
+      fired = true;
+    });
+    if (fired) Store.save(data);
+  }
+
   function renderDaily() {
     var container = document.getElementById("daily-content");
     var today = new Date();
@@ -1051,6 +1112,7 @@
     var moonSignObj = Astro.moonSign(today);
     var sunSign = data.birthday ? Astro.sunSign(new Date(data.birthday + "T00:00:00")) : null;
     var pred = Cycle.predict(data.periods, data, today);
+    runReminders(pred, today);
 
     var html = backupNudgeHtml();
     var title = data.name ? escapeHtml(data.name) + "'s day 🌙" : "Today 🌙";
@@ -1492,11 +1554,28 @@
     document.getElementById("set-period").value = data.periodLength;
     document.getElementById("set-intimacy").checked = data.showIntimacy !== false;
     document.getElementById("set-positions").checked = data.showPositions !== false;
+    var rem = data.reminders || {};
+    document.getElementById("rem-enabled").checked = !!rem.enabled;
+    document.getElementById("rem-period").checked = rem.period !== false;
+    document.getElementById("rem-ovulation").checked = rem.ovulation !== false;
+    document.getElementById("rem-pms").checked = rem.pms !== false;
+    document.getElementById("rem-phase").checked = rem.phase !== false;
+    updateRemStatus();
     var stored = Store.backendName() === "capacitor-preferences"
       ? "Stored privately in durable device storage (Capacitor)."
       : "Stored privately in this browser on this device (localStorage).";
     document.getElementById("storage-note").textContent = "🔒 " + stored;
     updateSunPreview();
+  }
+
+  function updateRemStatus() {
+    var el = document.getElementById("rem-status");
+    if (!el) return;
+    if (!("Notification" in window)) { el.textContent = "This browser doesn’t support notifications."; return; }
+    if (!data.reminders || !data.reminders.enabled) { el.textContent = ""; return; }
+    if (Notification.permission === "granted") el.textContent = "🔔 Reminders on — they show when you open the app.";
+    else if (Notification.permission === "denied") el.textContent = "Notifications are blocked in your browser settings; enable them there to receive reminders.";
+    else el.textContent = "Tap Save settings to allow notifications.";
   }
 
   function updateSunPreview() {
@@ -1608,10 +1687,23 @@
       data.periodLength = clampNum(document.getElementById("set-period").value, 1, 10, 5);
       data.showIntimacy = document.getElementById("set-intimacy").checked;
       data.showPositions = document.getElementById("set-positions").checked;
+      data.reminders = {
+        enabled: document.getElementById("rem-enabled").checked,
+        period: document.getElementById("rem-period").checked,
+        ovulation: document.getElementById("rem-ovulation").checked,
+        pms: document.getElementById("rem-pms").checked,
+        phase: document.getElementById("rem-phase").checked
+      };
       Store.save(data);
       var status = document.getElementById("save-status");
       status.textContent = "Saved ✓";
       setTimeout(function () { status.textContent = ""; }, 2000);
+      // Ask for notification permission when reminders are turned on.
+      if (data.reminders.enabled && "Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission().then(function () { updateRemStatus(); renderDaily(); });
+      } else {
+        updateRemStatus();
+      }
       renderSettings();
       renderDaily();
     });
@@ -1750,4 +1842,11 @@
   }
 
   document.addEventListener("DOMContentLoaded", init);
+
+  // Register the service worker for offline support + notifications.
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
 })();

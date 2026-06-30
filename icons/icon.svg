@@ -1,0 +1,10 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="HerRhythm">
+  <rect width="512" height="512" rx="112" fill="#3A4D3E"/>
+  <!-- ember crescent moon (safe within maskable center zone) -->
+  <g>
+    <circle cx="262" cy="232" r="118" fill="#C67C4E"/>
+    <circle cx="312" cy="206" r="106" fill="#3A4D3E"/>
+  </g>
+  <!-- grounded slate horizon -->
+  <path d="M86 392 Q256 332 426 392 L426 444 Q256 384 86 444 Z" fill="#4A5A6F" opacity="0.6"/>
+</svg>

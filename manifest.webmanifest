@@ -1,0 +1,14 @@
+{
+  "name": "HerRhythm — Cycle Companion",
+  "short_name": "HerRhythm",
+  "description": "A grounded guide to understanding and supporting her cycle.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4F1ED",
+  "theme_color": "#3A4D3E",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -8,6 +8,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=IBM+Plex+Mono&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#3A4D3E" />
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="HerRhythm" />
 </head>
 <body>
   <div class="app">
@@ -144,6 +150,17 @@
             <input type="checkbox" id="set-positions" />
             <span>Include a 🛏️ suggested position idea in that card</span>
           </label>
+        </div>
+
+        <div class="card">
+          <h2>Reminders</h2>
+          <p class="muted">A heads-up on key days. On the web these appear when you open the app; install it to your home screen (or use the mobile build) for true scheduled alerts.</p>
+          <label class="checkbox-row"><input type="checkbox" id="rem-enabled" /><span>Enable reminders</span></label>
+          <label class="checkbox-row"><input type="checkbox" id="rem-period" /><span>Period due / late</span></label>
+          <label class="checkbox-row"><input type="checkbox" id="rem-ovulation" /><span>Fertile window &amp; ovulation</span></label>
+          <label class="checkbox-row"><input type="checkbox" id="rem-pms" /><span>PMS heads-up (3 days before)</span></label>
+          <label class="checkbox-row"><input type="checkbox" id="rem-phase" /><span>Phase changes</span></label>
+          <p class="muted" id="rem-status"></p>
         </div>
 
         <div class="card">

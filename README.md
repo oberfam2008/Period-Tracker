@@ -78,6 +78,23 @@ largely drive it. Notes are scanned for a small mood vocabulary to surface
 - Full list of logged periods with per-cycle gaps and durations; set or edit any
   period's last day inline
 
+### 📅 Calendar tab
+- Color-coded month grid of cycle phases (projected forward past the last log)
+- Logged period days, fertile window, ovulation, and today are marked; days with
+  a journal note or logged encounter get a dot
+- Previous/next month navigation with a legend
+
+### 🔔 Install & reminders (PWA)
+- Installable to the home screen with offline support (web app manifest +
+  service worker; network-first so updates apply on reload).
+- Optional **reminders** (Settings → Reminders) for key days: period due/late,
+  fertile-window open & ovulation, a PMS heads-up (3 days before), and phase
+  changes. Toggling them on requests notification permission.
+- **Web limitation:** browser notifications fire when you open the app (there's
+  no backend push). For true scheduled alerts while the app is closed, the
+  Capacitor build can swap in `@capacitor/local-notifications` — the reminder
+  rules already live in `dueReminders()`.
+
 ### ⚙️ Settings tab
 - Name and **birthday** (drives your sun sign)
 - Default **cycle** and **period** lengths
