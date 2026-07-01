@@ -2023,7 +2023,18 @@
     if (meta) meta.setAttribute("content", dark ? "#191815" : "#3A4D3E");
   }
 
+  // Show the text wordmark if the logo image can't be loaded (not added yet).
+  function setupLogoFallback() {
+    var logo = document.querySelector(".app-logo");
+    var wm = document.querySelector(".app-wordmark");
+    if (!logo || !wm) return;
+    function fallback() { logo.style.display = "none"; wm.style.display = "block"; }
+    if (logo.complete && logo.naturalWidth === 0) fallback();
+    else logo.addEventListener("error", fallback);
+  }
+
   function init() {
+    setupLogoFallback();
     // Hydrate data from the (possibly async) storage backend before rendering.
     Store.init().then(function (loaded) {
       data = loaded;

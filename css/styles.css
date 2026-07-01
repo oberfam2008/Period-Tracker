@@ -105,6 +105,13 @@ body {
   text-align: center;
   margin-bottom: 36px;
 }
+.app-logo {
+  display: block;
+  width: 58%;
+  max-width: 220px;
+  height: auto;
+  margin: 0 auto;
+}
 .app-header h1 {
   margin: 0;
   font-family: var(--font-display);
@@ -113,6 +120,8 @@ body {
   letter-spacing: 0.5px;
   color: var(--ink);
 }
+/* Text wordmark is a fallback shown only if the logo image is missing */
+.app-wordmark { display: none; }
 .tagline {
   margin: 8px 0 0;
   font-family: var(--font-mono);
