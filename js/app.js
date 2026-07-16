@@ -1737,10 +1737,15 @@
     document.getElementById("rem-pms").checked = rem.pms !== false;
     document.getElementById("rem-phase").checked = rem.phase !== false;
     updateRemStatus();
-    var stored = Store.backendName() === "capacitor-preferences"
-      ? "Stored privately in durable device storage (Capacitor)."
-      : "Stored privately in this browser on this device (localStorage).";
+    var backendName = Store.backendName();
+    var stored = backendName === "supabase"
+      ? "Stored in your account and available on any device you sign in on."
+      : backendName === "capacitor-preferences"
+        ? "Stored privately in durable device storage (Capacitor)."
+        : "Stored privately in this browser on this device (localStorage).";
     document.getElementById("storage-note").textContent = "🔒 " + stored;
+    var emailEl = document.getElementById("account-email");
+    if (emailEl) emailEl.textContent = currentUserEmail || "—";
     updateSunPreview();
   }
 
@@ -1860,6 +1865,11 @@
 
   function setupSettingsControls() {
     document.getElementById("set-birthday").addEventListener("change", updateSunPreview);
+
+    document.getElementById("set-signout").addEventListener("click", function () {
+      Auth.signOut().catch(function () {});
+      // resetToAuthScreen() runs via the SIGNED_OUT auth-state event.
+    });
 
     document.getElementById("set-theme").addEventListener("change", function () {
       data.theme = document.getElementById("set-theme").value;
@@ -2021,30 +2031,154 @@
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute("content", dark ? "#191815" : "#3A4D3E");
+    // Cache just the theme choice (not the whole data blob) so the inline
+    // head script can avoid a flash on the next load regardless of backend.
+    try { window.localStorage.setItem("herrhythm.theme", t); } catch (e) {}
   }
 
-  // Show the text wordmark if the logo image can't be loaded (not added yet).
+  // Show the text wordmark if a logo image can't be loaded (not added yet).
+  // Runs for both instances: the auth screen and the in-app header.
   function setupLogoFallback() {
-    var logo = document.querySelector(".app-logo");
-    var wm = document.querySelector(".app-wordmark");
-    if (!logo || !wm) return;
-    function fallback() { logo.style.display = "none"; wm.style.display = "block"; }
-    if (logo.complete && logo.naturalWidth === 0) fallback();
-    else logo.addEventListener("error", fallback);
+    document.querySelectorAll(".app-logo").forEach(function (logo) {
+      var wm = logo.parentElement && logo.parentElement.querySelector(".app-wordmark");
+      if (!wm) return;
+      function fallback() { logo.style.display = "none"; wm.style.display = "block"; }
+      if (logo.complete && logo.naturalWidth === 0) fallback();
+      else logo.addEventListener("error", fallback);
+    });
+  }
+
+  /* ---------- Auth-driven app lifecycle ----------
+   * The app is gated behind a Supabase account. <body> carries one of three
+   * state classes (state-loading / state-auth / state-app) that the CSS uses
+   * to show exactly one of the loading screen, the auth screen, or the app.
+   */
+  var currentUserEmail = "";
+  var appWired = false; // guards one-time event-listener setup across sign-in/out cycles
+
+  function setBodyState(state) { document.body.className = "state-" + state; }
+
+  function loadAppForUser(user) {
+    currentUserEmail = (user && user.email) || "";
+    Store.setBackend(Store.createSupabaseBackend(Auth.client(), user.id));
+    return Store.init().then(function (loaded) {
+      data = loaded;
+      applyTheme();
+      if (!appWired) {
+        setupTabs();
+        setupHistoryControls();
+        setupCalendarControls();
+        setupJournalControls();
+        setupSettingsControls();
+        appWired = true;
+      }
+      renderDaily();
+      setBodyState("app");
+    });
+  }
+
+  function resetToAuthScreen() {
+    currentUserEmail = "";
+    data = undefined;
+    Store.setBackend(Store.localStorageBackend);
+    showAuthForm("signin");
+    setBodyState("auth");
+  }
+
+  function showAuthForm(name) {
+    document.querySelectorAll(".auth-tab").forEach(function (t) {
+      t.classList.toggle("active", t.getAttribute("data-authtab") === name);
+    });
+    document.querySelectorAll(".auth-form").forEach(function (f) {
+      f.classList.toggle("active", f.id === name + "-form");
+    });
+    var tabsEl = document.querySelector(".auth-tabs");
+    if (tabsEl) tabsEl.style.display = (name === "signin" || name === "signup") ? "flex" : "none";
+    setAuthStatus("");
+  }
+
+  function setAuthStatus(msg, isError) {
+    var el = document.getElementById("auth-status");
+    if (!el) return;
+    el.textContent = msg || "";
+    el.style.color = isError ? "var(--period)" : "var(--muted)";
+  }
+
+  function authErrorMessage(err) {
+    var m = (err && err.message) || String(err);
+    if (/already registered/i.test(m)) return "That email is already registered — try signing in instead.";
+    if (/invalid login credentials/i.test(m)) return "Incorrect email or password.";
+    if (/password should be at least/i.test(m)) return "Password is too short.";
+    return m;
+  }
+
+  function setupAuthFormControls() {
+    document.querySelectorAll(".auth-tab").forEach(function (tab) {
+      tab.addEventListener("click", function () { showAuthForm(tab.getAttribute("data-authtab")); });
+    });
+    document.getElementById("forgot-link").addEventListener("click", function () { showAuthForm("reset"); });
+    document.getElementById("reset-back").addEventListener("click", function () { showAuthForm("signin"); });
+
+    document.getElementById("signin-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = document.getElementById("signin-email").value.trim();
+      var pw = document.getElementById("signin-password").value;
+      setAuthStatus("Signing in…");
+      Auth.signIn(email, pw).catch(function (err) { setAuthStatus(authErrorMessage(err), true); });
+    });
+
+    document.getElementById("signup-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = document.getElementById("signup-email").value.trim();
+      var pw = document.getElementById("signup-password").value;
+      var pw2 = document.getElementById("signup-password2").value;
+      if (pw !== pw2) { setAuthStatus("Passwords don't match.", true); return; }
+      if (pw.length < 6) { setAuthStatus("Password must be at least 6 characters.", true); return; }
+      setAuthStatus("Creating your account…");
+      Auth.signUp(email, pw).then(function (result) {
+        if (!result.session) {
+          setAuthStatus("Account created — check your email to confirm, then sign in.");
+          showAuthForm("signin");
+        }
+      }).catch(function (err) { setAuthStatus(authErrorMessage(err), true); });
+    });
+
+    document.getElementById("reset-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = document.getElementById("reset-email").value.trim();
+      setAuthStatus("Sending reset link…");
+      Auth.sendPasswordReset(email).then(function () {
+        setAuthStatus("Check your email for a password reset link.");
+      }).catch(function (err) { setAuthStatus(authErrorMessage(err), true); });
+    });
+
+    document.getElementById("newpass-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var pw = document.getElementById("newpass-password").value;
+      if (pw.length < 6) { setAuthStatus("Password must be at least 6 characters.", true); return; }
+      setAuthStatus("Updating password…");
+      Auth.updatePassword(pw).then(function () {
+        setAuthStatus("Password updated — you're signed in.");
+      }).catch(function (err) { setAuthStatus(authErrorMessage(err), true); });
+    });
   }
 
   function init() {
     setupLogoFallback();
-    // Hydrate data from the (possibly async) storage backend before rendering.
-    Store.init().then(function (loaded) {
-      data = loaded;
-      applyTheme();
-      setupTabs();
-      setupHistoryControls();
-      setupCalendarControls();
-      setupJournalControls();
-      setupSettingsControls();
-      renderDaily();
+    setupAuthFormControls();
+
+    if (!Auth.isConfigured()) {
+      setBodyState("auth");
+      setAuthStatus("Sign-in isn't configured for this deployment (missing Supabase settings).", true);
+      return;
+    }
+
+    Auth.onAuthStateChange(function (event, session) {
+      if (event === "TOKEN_REFRESHED") return; // session still valid; no need to reload
+      if (event === "PASSWORD_RECOVERY") { showAuthForm("newpass"); setBodyState("auth"); return; }
+      if (event === "SIGNED_OUT") { resetToAuthScreen(); return; }
+      if (session) { loadAppForUser(session.user); }
+      else if (event === "INITIAL_SESSION") { showAuthForm("signin"); setBodyState("auth"); }
     });
   }
 

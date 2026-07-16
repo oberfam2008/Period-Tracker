@@ -1,15 +1,19 @@
-/* storage.js — local-first persistence for HerRhythm.
+/* storage.js — persistence for HerRhythm.
  *
- * Data never leaves the device. The persistence backend is pluggable:
- *   - Web (default): browser localStorage (synchronous).
+ * The persistence backend is pluggable:
+ *   - Web, signed out (default): browser localStorage (synchronous).
+ *   - Signed in: Supabase (see createSupabaseBackend), so an account's data
+ *     follows the user across devices. Row-level security scopes every read
+ *     and write to auth.uid(), so one user can never see another's data.
  *   - Mobile (Capacitor): if the @capacitor/preferences plugin is present,
- *     it is detected automatically and used instead — durable native storage
- *     that is NOT subject to browser cache eviction.
+ *     it is detected automatically and used instead of localStorage — durable
+ *     native storage that is NOT subject to browser cache eviction.
  *
- * Backends may be synchronous (localStorage) or asynchronous (Capacitor), so
- * the data is hydrated once into an in-memory cache at startup via init().
- * After that, load() is a synchronous read of the cache and save() writes
- * through to the backend (awaitable, but callers can fire-and-forget).
+ * Backends may be synchronous (localStorage) or asynchronous (Supabase,
+ * Capacitor), so the data is hydrated once into an in-memory cache at startup
+ * via init(). After that, load() is a synchronous read of the cache and
+ * save() writes through to the backend (awaitable, but callers can
+ * fire-and-forget).
  */
 (function (global) {
   "use strict";
@@ -81,6 +85,46 @@
     return localStorageBackend;
   }
 
+  // Cloud backend used once a user is signed in. Reads/writes the single
+  // user_data row belonging to `userId`; RLS policies enforce that no other
+  // user's row is ever visible. Mirrors to a local cache so a transient
+  // network failure falls back to the last-known data instead of resetting
+  // the UI to defaults.
+  function createSupabaseBackend(client, userId) {
+    var cacheKey = "herrhythm.cache." + userId;
+    function readCache() {
+      try { return global.localStorage.getItem(cacheKey); } catch (e) { return null; }
+    }
+    function writeCache(raw) {
+      try { global.localStorage.setItem(cacheKey, raw); } catch (e) {}
+    }
+
+    return {
+      name: "supabase",
+      getItem: function () {
+        return client.from("user_data").select("data").eq("user_id", userId).maybeSingle()
+          .then(function (res) {
+            if (res.error) throw res.error;
+            var raw = res.data ? JSON.stringify(res.data.data) : null;
+            if (raw) writeCache(raw);
+            return raw;
+          })
+          .catch(function () { return readCache(); });
+      },
+      setItem: function (k, v) {
+        writeCache(v);
+        return client.from("user_data")
+          .upsert({ user_id: userId, data: JSON.parse(v) }, { onConflict: "user_id" })
+          .then(function (res) { if (res.error) throw res.error; return true; });
+      },
+      removeItem: function () {
+        try { global.localStorage.removeItem(cacheKey); } catch (e) {}
+        return client.from("user_data").delete().eq("user_id", userId)
+          .then(function (res) { if (res.error) throw res.error; });
+      }
+    };
+  }
+
   var backend = detectBackend();
 
   function setBackend(b) { backend = b; }
@@ -128,6 +172,8 @@
     replaceAll: replaceAll,
     setBackend: setBackend,
     backendName: backendName,
+    createSupabaseBackend: createSupabaseBackend,
+    localStorageBackend: localStorageBackend,
     DEFAULTS: DEFAULTS
   };
 })(typeof window !== "undefined" ? window : this);

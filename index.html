@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HerRhythm — Cycle Companion</title>
   <script>
-    // Apply saved theme before paint to avoid a flash of the wrong theme.
+    // Apply the last-known theme before paint to avoid a flash of the wrong
+    // theme. This tiny cache is written by applyTheme() in app.js and works
+    // regardless of which storage backend (local or account) is active.
     try {
-      var d = JSON.parse(localStorage.getItem("luna.data.v1") || "{}");
-      var t = d.theme || "system";
+      var t = localStorage.getItem("herrhythm.theme") || "system";
       var dark = t === "dark" || (t === "system" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
       document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
     } catch (e) {}
@@ -24,7 +25,55 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="HerRhythm" />
 </head>
-<body>
+<body class="state-loading">
+  <!-- LOADING (shown briefly while we check for an existing session) -->
+  <div id="loading-screen" class="loading-screen">
+    <p class="muted">Loading…</p>
+  </div>
+
+  <!-- AUTH (sign in / create account / reset password) -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-box">
+      <img class="app-logo" src="assets/herrhythm-logo.png" alt="HerRhythm" />
+      <h1 class="app-wordmark">HerRhythm</h1>
+      <p class="tagline">A grounded guide to understanding and supporting her cycle.</p>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" data-authtab="signin">Sign in</button>
+        <button type="button" class="auth-tab" data-authtab="signup">Create account</button>
+      </div>
+
+      <form id="signin-form" class="auth-form active">
+        <label>Email<input type="email" id="signin-email" required autocomplete="email" /></label>
+        <label>Password<input type="password" id="signin-password" required autocomplete="current-password" /></label>
+        <button type="submit" class="btn auth-submit">Sign in</button>
+        <button type="button" id="forgot-link" class="link-btn">Forgot password?</button>
+      </form>
+
+      <form id="signup-form" class="auth-form">
+        <label>Email<input type="email" id="signup-email" required autocomplete="email" /></label>
+        <label>Password<input type="password" id="signup-password" required autocomplete="new-password" minlength="6" /></label>
+        <label>Confirm password<input type="password" id="signup-password2" required autocomplete="new-password" minlength="6" /></label>
+        <button type="submit" class="btn auth-submit">Create account</button>
+      </form>
+
+      <form id="reset-form" class="auth-form">
+        <p class="muted">Enter your email and we'll send a link to reset your password.</p>
+        <label>Email<input type="email" id="reset-email" required autocomplete="email" /></label>
+        <button type="submit" class="btn auth-submit">Send reset link</button>
+        <button type="button" id="reset-back" class="link-btn">Back to sign in</button>
+      </form>
+
+      <form id="newpass-form" class="auth-form">
+        <p class="muted">Choose a new password for your account.</p>
+        <label>New password<input type="password" id="newpass-password" required autocomplete="new-password" minlength="6" /></label>
+        <button type="submit" class="btn auth-submit">Update password</button>
+      </form>
+
+      <p id="auth-status" class="auth-status"></p>
+    </div>
+  </div>
+
   <div class="app">
     <header class="app-header">
       <img class="app-logo" src="assets/herrhythm-logo.png" alt="HerRhythm" />
@@ -132,6 +181,12 @@
       <!-- SETTINGS -->
       <section id="settings" class="panel" role="tabpanel">
         <div class="card">
+          <h2>Account</h2>
+          <p class="muted">Signed in as <strong id="account-email">—</strong></p>
+          <button id="set-signout" class="btn btn-secondary">Sign out</button>
+        </div>
+
+        <div class="card">
           <h2>Her info</h2>
           <label>Her name
             <input type="text" id="set-name" placeholder="Her name" />
@@ -195,7 +250,7 @@
 
         <div class="card">
           <h2>Backup &amp; restore</h2>
-          <p class="muted">Your data lives only on this device. Download a backup file to keep it safe or move it to another device — nothing is uploaded anywhere.</p>
+          <p class="muted">Download a backup file as an extra safety net, or to move data between accounts.</p>
           <div class="backup-row">
             <button id="set-export" class="btn btn-secondary">⬇️ Export backup</button>
             <button id="set-import" class="btn btn-secondary">⬆️ Import backup</button>
@@ -212,10 +267,13 @@
     </footer>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/astro.js"></script>
   <script src="js/cycle.js"></script>
   <script src="js/learn.js"></script>
   <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,10 +1,11 @@
 # HerRhythm — Cycle Companion
 
-A self-contained tracker that helps a partner understand and support the person
-whose cycle is being tracked, connecting **her cycle** with **moon phases** and
+A tracker that helps a partner understand and support the person whose cycle
+is being tracked, connecting **her cycle** with **moon phases** and
 **astrological star signs** for plain-language mood insights and practical,
-day-to-day tips. No accounts, no servers, no build step — your data stays
-**only on your device** (see [Data & storage](#-data--storage)).
+day-to-day tips. It's a real multi-user app — anyone can create their own
+account, and every account's data is private to them (see
+[Accounts & sharing](#-accounts--sharing)).
 
 ## 🎨 Design
 
@@ -99,44 +100,90 @@ largely drive it. Notes are scanned for a small mood vocabulary to surface
   rules already live in `dueReminders()`.
 
 ### ⚙️ Settings tab
+- **Account**: signed-in email + sign out
 - Name and **birthday** (drives your sun sign)
 - Default **cycle** and **period** lengths
 - Clear-all-data control
 
-## 🔒 Data & storage
+## 👤 Accounts & sharing
 
-HerRhythm is **local-first**: your data never leaves the device and is never uploaded
-anywhere. The persistence layer (`js/storage.js`) is a small pluggable backend:
+HerRhythm is a real multi-user app, backed by [Supabase](https://supabase.com)
+(hosted Postgres + auth). Anyone can create their own account from the sign-in
+screen; **each account's data is private to that account** — there's no way
+for one user to see another's data.
 
-- **Web (default):** browser `localStorage`.
-- **Mobile (Capacitor):** if the app is wrapped with Capacitor and the
-  `@capacitor/preferences` plugin is present, it is **detected automatically**
-  and used instead — durable native storage that is *not* subject to browser
-  cache eviction. No code change is needed to switch.
+- **Sign up / sign in** — email + password. New accounts may need to confirm
+  their email first, depending on the Supabase project's auth settings (see
+  below).
+- **Forgot password** — sends a reset-password email; clicking the link
+  returns you to the app with a "set new password" form.
+- **Sign out** — Settings → Account.
 
-Because a backend may be synchronous (localStorage) or asynchronous (Capacitor),
-data is hydrated once into memory via `Store.init()` at startup; after that
-`load()` is a synchronous read and `save()` writes through to the backend.
+### How data isolation works
+
+All of an account's data (name, birthday, logged periods, journal, settings —
+everything `js/storage.js` used to keep in `localStorage`) lives in one row of
+a `user_data` table, keyed by `user_id`. **Row-level security (RLS)** policies
+on that table restrict every select/insert/update/delete to
+`auth.uid() = user_id`, enforced by Postgres itself — not just app-level
+checks. This was verified directly against the live database: a second
+simulated user could not read, update, or delete the first user's row, and an
+attempt to insert data under someone else's `user_id` was rejected outright.
+
+### Setting up your own Supabase project
+
+The app ships pointed at a project already set up with the right schema
+(`js/supabase-config.js` holds the project URL and a publishable/anon key —
+safe to expose client-side, since RLS is what actually protects the data, not
+secrecy of that key). To point it at your own project instead:
+
+1. Create a Supabase project and note its URL and **publishable** key
+   (Project Settings → API). Never put the **service_role** key in client code.
+2. Run the schema in the SQL editor:
+   ```sql
+   create table public.user_data (
+     user_id uuid primary key references auth.users(id) on delete cascade,
+     data jsonb not null default '{}'::jsonb,
+     updated_at timestamptz not null default now()
+   );
+   alter table public.user_data enable row level security;
+   create policy "select own data" on public.user_data for select using (auth.uid() = user_id);
+   create policy "insert own data" on public.user_data for insert with check (auth.uid() = user_id);
+   create policy "update own data" on public.user_data for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
+   create policy "delete own data" on public.user_data for delete using (auth.uid() = user_id);
+   ```
+3. Update `js/supabase-config.js` with your project's URL and publishable key.
+4. In Authentication → Providers → Email, decide whether to require email
+   confirmation. Leaving it on is more secure for a public deployment; turning
+   it off makes testing/onboarding frictionless (useful while you're the only
+   user). Either way, Supabase's default email sending has fair-use limits —
+   configure custom SMTP before real-world signup volume.
+
+### A note on responsibility
+
+Making this shareable means cycle, journal, and intimacy data for other people
+now lives in a real hosted database instead of only on their own device. That's
+a deliberate trade-off for "a product other people can use," but it's worth
+taking seriously given how sensitive this data is: keep the Supabase dashboard
+access locked down, and if you're sharing this beyond a few trusted people,
+write a short privacy note for users about what's stored and where.
 
 ### Backup & restore
 
-Since the data is device-only, **Settings → Backup & restore** lets you:
+**Settings → Backup & restore** still lets you **export** your account's data
+to a JSON file and **import** it back — useful as an extra safety net, or to
+move data if you ever change accounts.
 
-- **Export** all data to a JSON file (fully on-device, nothing is uploaded).
-- **Import** a previously exported file to restore it — also the simplest way to
-  move your data between devices without any cloud.
+### Mobile / offline storage backends (still available)
 
-Keep a backup occasionally: clearing browser data (or browser cache eviction on
-the web) can otherwise wipe local data.
+`js/storage.js` remains a pluggable backend: `localStorage` is used before
+sign-in (and as a resilience cache mirroring the last-synced cloud data, so a
+brief network drop doesn't reset the UI to defaults), and if the app is
+wrapped with [Capacitor](https://capacitorjs.com/) and the
+`@capacitor/preferences` plugin is present, durable native storage is detected
+automatically for local-only builds.
 
-### Wrapping for mobile (later)
-
-Because the whole app is a self-contained static web app, the lightest path to
-Android/iOS is [Capacitor](https://capacitorjs.com/): add `@capacitor/core`,
-`@capacitor/preferences`, and the platform projects, point the webDir at this
-folder, and durable native storage turns on automatically via the detection above.
-
-## Running it
+## Running it locally
 
 It's plain HTML/CSS/JS — just open `index.html` in a browser, or serve it:
 
@@ -144,6 +191,26 @@ It's plain HTML/CSS/JS — just open `index.html` in a browser, or serve it:
 python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
+
+Sign-in requires network access (to reach Supabase) even when running locally.
+
+## 🌐 Deploying (making it shareable)
+
+The app is a static site — there's no build step and no server to run
+yourself, since Supabase is the backend. Any static host works:
+
+- **Netlify** — drag-and-drop the project folder onto [app.netlify.com/drop](https://app.netlify.com/drop), or connect the git repo for auto-deploys.
+- **Vercel** — `vercel` from the project folder, or import the git repo at vercel.com.
+- **Cloudflare Pages** / **GitHub Pages** — point either at this repo/branch; no build command needed (leave it blank or `true`).
+
+Whichever host you pick, once it's live:
+- The URL it gives you *is* the shareable link — anyone who opens it can create
+  their own account.
+- HTTPS is required for service workers/notifications to work — all of the
+  hosts above provide it automatically.
+- No environment variables to configure at the host level — the Supabase URL
+  and publishable key are already in `js/supabase-config.js` and are meant to
+  ship with the client.
 
 ## How the math works
 
@@ -168,10 +235,16 @@ contraception or diagnosis.
 ## Project structure
 
 ```
-index.html        markup + tab layout
-css/styles.css    styling
-js/astro.js       sun sign, moon phase, moon sign
-js/cycle.js       period/ovulation predictions
-js/storage.js     localStorage persistence
-js/app.js         UI wiring + mood-insight engine
+index.html              markup + tab layout + auth screens
+css/styles.css          styling (incl. auth/loading states, dark theme)
+js/astro.js             sun sign, moon phase, moon sign
+js/cycle.js             period/ovulation predictions
+js/learn.js             pattern learning from journal/encounters
+js/storage.js           pluggable persistence (Supabase / localStorage / Capacitor)
+js/auth.js              Supabase Auth wrapper (sign up/in/out, password reset)
+js/supabase-config.js   project URL + publishable key
+js/app.js               UI wiring, auth-driven app lifecycle, mood-insight engine
+manifest.webmanifest    PWA manifest
+sw.js                   service worker (offline + notification clicks)
+icons/, assets/         app icon and logo
 ```
