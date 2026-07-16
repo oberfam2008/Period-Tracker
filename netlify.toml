@@ -1,0 +1,46 @@
+# Netlify config for HerRhythm — a static site with no build step.
+# The backend is Supabase; there's nothing to compile or bundle here.
+
+[build]
+  publish = "."
+
+# Safe, low-risk hardening headers. Deliberately NOT shipping a Content-
+# Security-Policy here: a wrong CSP would silently break sign-in (Supabase
+# XHR, the CDN auth script, Google Fonts) in ways that are hard to diagnose
+# without a live deploy to test against. See README for a CSP you can add
+# and test yourself if you want to go further.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# No filename hashing/fingerprinting on this project, so app files must
+# revalidate on every load rather than sit in a long-lived cache — otherwise
+# a redeploy wouldn't reach users promptly. "no-cache" still allows cheap
+# conditional (ETag) revalidation, it just forbids using a stale copy outright.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "no-cache"

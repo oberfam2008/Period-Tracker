@@ -194,23 +194,61 @@ python3 -m http.server 8000
 
 Sign-in requires network access (to reach Supabase) even when running locally.
 
-## 🌐 Deploying (making it shareable)
+## 🌐 Deploying to Netlify (making it shareable)
 
-The app is a static site — there's no build step and no server to run
-yourself, since Supabase is the backend. Any static host works:
+The app is a static site — no build step, no server of your own to run, since
+Supabase is the backend. `netlify.toml` is already set up: `publish = "."`
+(deploy the repo as-is) and a small set of low-risk production headers
+(`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, plus
+`Cache-Control: no-cache` on `index.html`/`sw.js`/`manifest.webmanifest`/
+`js/*`/`css/*` — this project doesn't fingerprint filenames, so those need to
+revalidate on every load or a redeploy wouldn't reach users promptly).
 
-- **Netlify** — drag-and-drop the project folder onto [app.netlify.com/drop](https://app.netlify.com/drop), or connect the git repo for auto-deploys.
-- **Vercel** — `vercel` from the project folder, or import the git repo at vercel.com.
-- **Cloudflare Pages** / **GitHub Pages** — point either at this repo/branch; no build command needed (leave it blank or `true`).
+**Pick one way to deploy:**
 
-Whichever host you pick, once it's live:
-- The URL it gives you *is* the shareable link — anyone who opens it can create
-  their own account.
-- HTTPS is required for service workers/notifications to work — all of the
-  hosts above provide it automatically.
-- No environment variables to configure at the host level — the Supabase URL
-  and publishable key are already in `js/supabase-config.js` and are meant to
-  ship with the client.
+- **Drag-and-drop (no account setup, no CLI):** go to
+  [app.netlify.com/drop](https://app.netlify.com/drop) and drag the project
+  folder in. You get a live URL immediately. To update later, drag the folder
+  in again.
+- **Git-connected (auto-deploys on every push — recommended):** on
+  [app.netlify.com](https://app.netlify.com), *Add new site → Import an
+  existing project*, pick this repo/branch. Build command: leave **blank**.
+  Publish directory: `.`. Netlify reads the rest from `netlify.toml`.
+- **CLI:** `npm install -g netlify-cli`, then from the project root:
+  `netlify login`, `netlify init` (or `netlify link` to an existing site),
+  `netlify deploy --prod`.
+
+No environment variables to set at Netlify — the Supabase URL and publishable
+key already live in `js/supabase-config.js` and are meant to ship with the
+client (see [Accounts & sharing](#-accounts--sharing) for why that's safe).
+
+### ⚠️ Required after your first deploy: tell Supabase the live URL
+
+Password-reset and email-confirmation links only redirect correctly to URLs
+Supabase has been told to trust. Once you have your Netlify URL:
+
+1. Supabase dashboard → your project → **Authentication → URL Configuration**.
+2. Set **Site URL** to your Netlify URL (e.g. `https://your-site.netlify.app`).
+3. Add the same URL (with `/**`, e.g. `https://your-site.netlify.app/**`) under
+   **Redirect URLs**.
+
+Skip this and the "reset password" and "confirm your email" links in signup/
+reset emails will land somewhere other than your deployed app.
+
+### Optional: a stricter Content-Security-Policy
+
+`netlify.toml` intentionally does **not** ship a CSP — a wrong one silently
+breaks sign-in (the Supabase requests, the auth CDN script, Google Fonts) in
+ways that are hard to diagnose without a live deploy to test against. If you
+want to harden further, something in this shape is a reasonable starting
+point, but **test sign-in/sign-up/password-reset immediately after adding it**:
+
+```
+Content-Security-Policy = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://aydxndyopdskcasaqvuw.supabase.co"
+```
+
+Other static hosts work too (Vercel, Cloudflare Pages, GitHub Pages) — the
+same `netlify.toml` values just translate to that host's equivalent config.
 
 ## How the math works
 
